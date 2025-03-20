@@ -35,7 +35,7 @@ There are multiple scenarios where push-based metrics collection might be more s
 
 ## Deployment
 
-YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully managed collection process.
+YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver AWS Cloudwatch metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully managed collection process.
 
 ![Deployment](img/deployment.png)
 
