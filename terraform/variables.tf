@@ -71,3 +71,8 @@ variable "lambda_schedule_rate" {
   type        = number
   default     = 5
 }
+
+variable "yace_config_file_path" {
+  description = "Path to the YACE config file"
+  type        = string
+}

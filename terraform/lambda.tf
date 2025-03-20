@@ -9,7 +9,7 @@ resource "aws_lambda_function" "this" {
       PROMETHEUS_REMOTE_WRITE_URL = var.create_amp_workspace ? "${aws_prometheus_workspace.this.0.prometheus_endpoint}api/v1/remote_write" : var.prometheus_endpoint
       PROMETHEUS_REGION           = var.prometheus_region
       CONFIG_SSM_PARAMETER        = aws_ssm_parameter.config.name
-      AUTH_TYPE = "AWS"
+      AUTH_TYPE                   = "AWS"
     }
   }
   logging_config {

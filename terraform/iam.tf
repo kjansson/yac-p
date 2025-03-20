@@ -90,27 +90,27 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     ]
     resources = [var.lambda_image_repository_arn]
   }
-   statement {
+  statement {
     effect = "Allow"
     actions = [
-        "tag:GetResources",
-        "cloudwatch:GetMetricData",
-        "cloudwatch:GetMetricStatistics",
-        "cloudwatch:ListMetrics",
-        "apigateway:GET",
-        "aps:ListWorkspaces",
-        "autoscaling:DescribeAutoScalingGroups",
-        "dms:DescribeReplicationInstances",
-        "dms:DescribeReplicationTasks",
-        "ec2:DescribeTransitGatewayAttachments",
-        "ec2:DescribeSpotFleetRequests",
-        "shield:ListProtections",
-        "storagegateway:ListGateways",
-        "storagegateway:ListTagsForResource",
-        "iam:ListAccountAliases"
+      "tag:GetResources",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics",
+      "apigateway:GET",
+      "aps:ListWorkspaces",
+      "autoscaling:DescribeAutoScalingGroups",
+      "dms:DescribeReplicationInstances",
+      "dms:DescribeReplicationTasks",
+      "ec2:DescribeTransitGatewayAttachments",
+      "ec2:DescribeSpotFleetRequests",
+      "shield:ListProtections",
+      "storagegateway:ListGateways",
+      "storagegateway:ListTagsForResource",
+      "iam:ListAccountAliases"
     ]
     resources = ["*"]
-  } 
+  }
 }
 
 resource "aws_iam_policy" "lambda_exec_policy" {
