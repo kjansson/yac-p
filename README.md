@@ -35,7 +35,7 @@ There are multiple scenarios where push-based metrics collection might be more s
 
 ## Deployment
 
-YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function on a schedule it will deliver metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully managed collection process.
+YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully managed collection process.
 
 ![Deployment](img/deployment.png)
 
@@ -45,7 +45,7 @@ YACE is great, but it usually requires something to host it. That might be somet
 
 ![YACE](img/YACE.png)
 
-YAC-p fits better where you want to manage as litte infrastructure as possible. It can also reduce latency in the metrics collection process, since it queries Cloudwatch at you desired rate and delivers metrics instantly to Prometheus.
+YAC-p fits better where you want to manage as little infrastructure as possible. It can also reduce latency in the metrics collection process, since it queries Cloudwatch at you desired rate and delivers metrics instantly to Prometheus.
 
 ![YAC-p](img/YAC-p.png)
 
