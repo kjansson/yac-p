@@ -1,0 +1,28 @@
+apiVersion: v1alpha1
+sts-region: us-east-1
+discovery:
+  exportedTagsOnMetrics:
+    AWS/EC2:
+      - Test
+      - InstanceId
+  jobs:
+    - type: AWS/EC2
+      regions: 
+        - eu-north-1
+      # period: 300
+      # length: 300
+      metrics:
+        - name: CPUUtilization
+          statistics:
+            - Average
+      searchTags:
+        - key: Test
+          value: Test1
+      dimensionNameRequirements:
+        - InstanceId
+      includeContextOnInfoMetrics: true
+      statistics:
+        - Average
+      period: 300
+      length: 300
+      addCloudwatchTimestamp: true
