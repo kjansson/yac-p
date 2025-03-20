@@ -29,7 +29,7 @@ There are multiple scenarios where push-based metrics collection might be more s
 ## Features
 
 - <b>Nothing to host</b> - Can run on fully managed AWS infrastructure, Eventbridge + Lambda + Amazon managed Prometheus (optional)
-- <b>Yace compatible</b> - Uses YACE native job configurations and its amazing discovery features
+- <b>Yace compatible</b> - Uses YACE native job configurations and its amazing discovery and metric enrichment features
 - <b>Manage Prometheus the way you want (or not)</b> - Authentication options for Amazon Managed Prometheus, self-hosted Prometheus, etc
 
 
