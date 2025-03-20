@@ -17,7 +17,8 @@ It runs as a Lambda function and only requires managed services to run (You don'
 
 ## Purpose
 
-YAC-p fits in wherever you don't want to do metrics scraping. There are multiple reasons for choosing push-based metrics collection over pull-based;
+YAC-p fits in wherever you don't want to do metrics scraping to get access to your Cloudwatch metrics in Prometheus.   
+There are multiple scenarios where push-based metrics collection might be more suitable than pull-based;
 
 - <b>Decentralizing</b> - When in a multi-account cloud environment with centralized metric collection, keeping the configuration and responsibility of metrics collection in the scope of the client account simplifies scaling.
 
