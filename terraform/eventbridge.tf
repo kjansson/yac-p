@@ -4,8 +4,8 @@ module "scheduler" {
   create_bus = false
 
   rules = {
-    crons = {
-      description         = format("%s-cron", var.name_prefix)
+    format("%s-cron", var.name_prefix) = {
+      description         = format("%s-cron invoker rule", var.name_prefix)
       schedule_expression = "rate(5 minutes)"
     }
   }
