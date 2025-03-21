@@ -1,13 +1,12 @@
 # YAC-p
 
-YAC-p (Yet Another Cloudwatch Pusher) is heavily <b>(heavily)</b> based on YACE (Yet Another Cloudwatch Exporter)  
+YAC-p (Yet Another Cloudwatch Pusher) is heavily <b>(heavily)</b> utilizing YACE Go packages (Yet Another Cloudwatch Exporter)  
 https://github.com/prometheus-community/yet-another-cloudwatch-exporter
 
+<u>Note: This is a work in progress.</u>
 
-<u>Note: This is a work in progress to say the least.</u>
-
-YAC-p utilizes Go libraries from YACE to collect and convert Cloudwatch metrics into Prometheus remote write format and writes to your endpoint of choice.  
-It runs as a Lambda function and only requires managed services to run (You don't have to host anything!).   
+YAC-p utilizes Go libraries from YACE to collect and convert Cloudwatch metrics into Prometheus format remote write format and writes to your endpoint of choice.  
+It runs as a Lambda function and only requires AWS managed services to run (You don't have to host anything!).   
 
 ## Deployment
 
@@ -28,10 +27,9 @@ There are multiple scenarios where push-based metrics collection might be more s
 
 ## Features
 
-- <b>Nothing to host</b> - Can run on fully managed AWS infrastructure, Eventbridge + Lambda + Amazon managed Prometheus (optional)
+- <b>Nothing to host</b> - Can run on fully managed AWS infrastructure, Eventbridge + Lambda + Amazon managed Prometheus (Works with your self-hosted Prometheus as well)
 - <b>Yace compatible</b> - Uses YACE native job configurations and its amazing discovery and metric enrichment features
 - <b>Manage Prometheus the way you want (or not)</b> - Authentication options for Amazon Managed Prometheus, self-hosted Prometheus, etc
-
 
 ## Deployment
 
@@ -39,9 +37,9 @@ YAC-p can be deployed using fully managed services. Using Eventbridge to schedul
 
 ![Deployment](img/deployment.png)
 
-## Deployment comparison
+## Deployment comparison to YACE
 
-YACE is great, but it usually requires something to host it. That might be something that you are trying to avoid. It also introduces latency into the metric collection process, since it requires two unsynchronized collections of the metrics before it ends up at a usable destination.  
+YACE is awesome, but it usually requires something to host it. That might be something that you are trying to avoid. It can also introduce latency into the metric collection process, since it requires two unsynchronized collections of the metrics before it ends up in Prometheus.  
 
 ![YACE](img/YACE.png)
 
@@ -50,4 +48,4 @@ YAC-p fits better where you want to manage as little infrastructure as possible.
 ![YAC-p](img/YAC-p.png)
 
 ## Please try it!
-Do it
+Do it, let me know how it worked out!
