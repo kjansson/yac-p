@@ -4,13 +4,10 @@ discovery:
   exportedTagsOnMetrics:
     AWS/EC2:
       - Test
-      - InstanceId
   jobs:
     - type: AWS/EC2
       regions: 
         - eu-north-1
-      # period: 300
-      # length: 300
       metrics:
         - name: CPUUtilization
           statistics:
