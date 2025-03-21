@@ -4,14 +4,14 @@ module "scheduler" {
   create_bus = false
 
   rules = {
-    crons = {
-      description         = format("%s-cron", var.name_prefix)
+    format("%s-cron", var.name_prefix) = {
+      description         = format("%s-cron invoker", var.name_prefix)
       schedule_expression = "rate(5 minutes)"
     }
   }
 
   targets = {
-    crons = [
+    format("%s-cron", var.name_prefix) = [
       {
         name  = format("%s-lambda-target", var.name_prefix)
         arn   = aws_lambda_function.this.arn

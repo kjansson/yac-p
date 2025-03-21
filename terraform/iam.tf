@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "ssm:GetParameters",
+      "s3:GetObject",
     ]
     resources = ["*"]
   }

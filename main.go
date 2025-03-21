@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -14,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
-	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/golang/snappy"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
@@ -42,28 +43,32 @@ func HandleRequest() {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
 	}
 
-	configSSMParameter := os.Getenv("CONFIG_SSM_PARAMETER")
+	configS3Path := os.Getenv("CONFIG_S3_PATH")
+	configS3Bucket := os.Getenv("CONFIG_S3_BUCKET")
 
-	if configSSMParameter != "" {
-		sess, err := session.NewSessionWithOptions(session.Options{
-			Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
-			SharedConfigState: session.SharedConfigEnable,
+	if configS3Bucket != "" && configS3Path != "" {
+		sess, err := createAWSSession()
+		if err != nil {
+			panic(err)
+		}
+		s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+		obj, err := s3svc.GetObject(&s3.GetObjectInput{
+			Bucket: aws.String(configS3Bucket),
+			Key:    aws.String(configS3Path),
 		})
 		if err != nil {
 			panic(err)
 		}
-		ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
-		param, err := ssmsvc.GetParameters(&ssm.GetParametersInput{
-			Names: []*string{&configSSMParameter},
-		})
+		content, err := io.ReadAll(obj.Body)
 		if err != nil {
 			panic(err)
 		}
-		content := param.Parameters[0].Value
-		err = os.WriteFile(configFilePath, []byte(*content), 0644)
+		err = os.WriteFile(configFilePath, content, 0644)
 		if err != nil {
 			panic(err)
 		}
+	} else {
+		panic("No valid configuration options given. Please provide CONFIG_S3_BUCKET and CONFIG_S3_PATH.")
 	}
 
 	config := config.ScrapeConf{} // Create a new scrape config
@@ -86,6 +91,9 @@ func HandleRequest() {
 		panic(err)
 	}
 
+	// Create prometheus timestamp
+	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
+
 	gMetrics, err := registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		panic(err)
@@ -93,6 +101,7 @@ func HandleRequest() {
 
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series
 	var oldTs int64
+	timestamped := false
 	// Process metrics into timeseries format that remote write expects
 	for _, fam := range gMetrics { // Range through metric types
 		metricName, metricType := fam.GetName(), fam.GetType() // Extraxt the metric type and name to use in prometheus time series
@@ -112,14 +121,24 @@ func HandleRequest() {
 			if err != nil {
 				panic(err)
 			}
-			timeStamp := metric.GetTimestampMs() // Extract the timestamp of the metric
-			if timeStamp == 0 {                  // The helper metrics does not have a timestamp, so we need to create one by storing the metric timestamps
-				timeStamp = oldTs
+
+			timestamp := metric.GetTimestampMs() // Extract the timestamp of the metric
+			// Metrics can have timestamps from Cloudwatch if YACE is configured to use them.
+			// If the metric does not have a timestamp, it's either a helper metric created by YACE or YACE is configured to ignore Cloudwatch timestamps.
+			// We store the timestamp of the first metric if it's non-zero and use it for the helper metrics,
+			// if the first metric is not timestamped we assume that YACE is configured to ignore Cloduwatch metrics and generate our own.
+			if timestamp == 0 {
+				if timestamped {
+					timestamp = oldTs
+				} else {
+					timestamp = newTimestamp
+				}
 			} else {
-				oldTs = timeStamp
+				oldTs = timestamp
+				timestamped = true
 			}
 
-			ts.Samples = append(ts.Samples, prompb.Sample{Value: value, Timestamp: timeStamp}) // Create prometheus time series samples
+			ts.Samples = append(ts.Samples, prompb.Sample{Value: value, Timestamp: timestamp}) // Create prometheus time series samples
 			timeSeries = append(timeSeries, ts)
 
 		}
@@ -206,4 +225,15 @@ func sendRequest(ts []prompb.TimeSeries) error {
 		return err
 	}
 	return nil
+}
+
+func createAWSSession() (*session.Session, error) {
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
+		SharedConfigState: session.SharedConfigEnable,
+	})
+	if err != nil {
+		return sess, err
+	}
+	return sess, err
 }
