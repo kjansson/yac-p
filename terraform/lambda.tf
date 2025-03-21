@@ -29,6 +29,6 @@ resource "aws_lambda_permission" "lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = module.scheduler.eventbridge_rule_arns["crons"]
+  source_arn    = module.scheduler.eventbridge_rule_arns[format("%s-cron", var.name_prefix)]
 }
 
