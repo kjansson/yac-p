@@ -8,7 +8,10 @@ resource "aws_lambda_function" "this" {
     variables = {
       PROMETHEUS_REMOTE_WRITE_URL = var.create_amp_workspace ? "${aws_prometheus_workspace.this.0.prometheus_endpoint}api/v1/remote_write" : var.prometheus_endpoint
       PROMETHEUS_REGION           = var.prometheus_region
-      CONFIG_SSM_PARAMETER        = aws_ssm_parameter.config.name
+      CONFIG_SSM_PARAMETER        = var.config_path == "" ? format("%s-yace-config", var.name_prefix) : var.config_path
+      CONFIG_S3_PATH            = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
+      CONFIG_S3_BUCKET = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
+      CONFIG_STORAGE_TYPE        = var.config_storage_type
       AUTH_TYPE                   = "AWS"
     }
   }

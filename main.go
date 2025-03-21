@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/golang/snappy"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
@@ -42,13 +44,13 @@ func HandleRequest() {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
 	}
 
+	configStorageType := os.Getenv("CONFIG_STORAGE_TYPE")
 	configSSMParameter := os.Getenv("CONFIG_SSM_PARAMETER")
+	configS3Path := os.Getenv("CONFIG_S3_PATH")
+	configS3Bucket := os.Getenv("CONFIG_S3_BUCKET")
 
-	if configSSMParameter != "" {
-		sess, err := session.NewSessionWithOptions(session.Options{
-			Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
-			SharedConfigState: session.SharedConfigEnable,
-		})
+	if configStorageType == "ssm" && configSSMParameter != "" {
+		sess, err := createAWSSession()
 		if err != nil {
 			panic(err)
 		}
@@ -64,6 +66,29 @@ func HandleRequest() {
 		if err != nil {
 			panic(err)
 		}
+	} else if configStorageType == "s3" && configS3Path != "" {
+		sess, err := createAWSSession()
+		if err != nil {
+			panic(err)
+		}
+		s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+		obj, err := s3svc.GetObject(&s3.GetObjectInput{
+			Bucket: aws.String(configS3Bucket),
+			Key:    aws.String(configS3Path),
+		})
+		if err != nil {
+			panic(err)
+		}
+		content, err := io.ReadAll(obj.Body)
+		if err != nil {
+			panic(err)
+		}
+		err = os.WriteFile(configFilePath, content, 0644)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		panic("No valid configuration options given. Please provide CONFIG_STORAGE_TYPE and either CONFIG_SSM_PARAMETER or CONFIG_S3_PATH and CONFIG_S3_BUCKET")
 	}
 
 	config := config.ScrapeConf{} // Create a new scrape config
@@ -220,4 +245,15 @@ func sendRequest(ts []prompb.TimeSeries) error {
 		return err
 	}
 	return nil
+}
+
+func createAWSSession() (*session.Session, error) {
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
+		SharedConfigState: session.SharedConfigEnable,
+	})
+	if err != nil {
+		return sess, err
+	}
+	return sess, err
 }

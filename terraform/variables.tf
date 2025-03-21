@@ -66,7 +66,34 @@ variable "lambda_schedule_rate" {
   default     = 5
 }
 
-variable "yace_config_file_path" {
-  description = "Path to the YACE config file."
+variable "config_file_local_path" {
+  description = "Path to the local YACE config file to upload and use."
   type        = string
+}
+
+variable "create_config_file_bucket" {
+  description = "Create an S3 bucket to store the YACE config file. Overrides config_bucket."
+  type        = bool
+  default     = false
+}
+
+variable "config_bucket" {
+  description = "Name of existing S3 bucket to store the YACE config file. Ignored if create_config_file_bucket is true."
+  type        = string
+  default     = ""
+}
+
+variable "config_storage_type" {
+  description = "Service used to store YACE config file for Lambda. Valid options are ssm or s3. Default is ssm."
+  type        = string
+  default     = "ssm"
+  validation {
+    condition = can(regex("^(ssm|s3)$", var.config_storage_type))
+    error_message = "config_storage_type must be either 'ssm' or 's3'"
+  }
+}
+
+variable "config_path" {
+  description = "Custom path to the YACE config file in the chosen storage service."
+  default     = ""
 }

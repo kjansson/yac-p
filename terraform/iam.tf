@@ -84,6 +84,13 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   statement {
     effect = "Allow"
     actions = [
+      "s3:GetObject",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "ecr:GetDownloadUrlForLayer",
       "ecr:BatchGetImage",
       "ecr:BatchCheckLayerAvailability"
