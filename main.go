@@ -16,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/golang/snappy"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
@@ -44,29 +43,10 @@ func HandleRequest() {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
 	}
 
-	configStorageType := os.Getenv("CONFIG_STORAGE_TYPE")
-	configSSMParameter := os.Getenv("CONFIG_SSM_PARAMETER")
 	configS3Path := os.Getenv("CONFIG_S3_PATH")
 	configS3Bucket := os.Getenv("CONFIG_S3_BUCKET")
 
-	if configStorageType == "ssm" && configSSMParameter != "" {
-		sess, err := createAWSSession()
-		if err != nil {
-			panic(err)
-		}
-		ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
-		param, err := ssmsvc.GetParameters(&ssm.GetParametersInput{
-			Names: []*string{&configSSMParameter},
-		})
-		if err != nil {
-			panic(err)
-		}
-		content := param.Parameters[0].Value
-		err = os.WriteFile(configFilePath, []byte(*content), 0644)
-		if err != nil {
-			panic(err)
-		}
-	} else if configStorageType == "s3" && configS3Path != "" {
+	if configS3Bucket != "" && configS3Path != "" {
 		sess, err := createAWSSession()
 		if err != nil {
 			panic(err)
@@ -88,7 +68,7 @@ func HandleRequest() {
 			panic(err)
 		}
 	} else {
-		panic("No valid configuration options given. Please provide CONFIG_STORAGE_TYPE and either CONFIG_SSM_PARAMETER or CONFIG_S3_PATH and CONFIG_S3_BUCKET")
+		panic("No valid configuration options given. Please provide CONFIG_S3_BUCKET and CONFIG_S3_PATH.")
 	}
 
 	config := config.ScrapeConf{} // Create a new scrape config

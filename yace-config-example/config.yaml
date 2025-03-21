@@ -10,8 +10,10 @@ discovery:
         - eu-north-1
       metrics:
         - name: CPUUtilization
-          statistics:
-            - Average
+        - name: NetworkIn
+        - name: NetworkOut
+        - name: EBSReadOps
+        - name: EBSWriteOps
       searchTags:
         - key: Test
           value: Test1

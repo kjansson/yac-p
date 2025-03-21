@@ -83,17 +83,7 @@ variable "config_bucket" {
   default     = ""
 }
 
-variable "config_storage_type" {
-  description = "Service used to store YACE config file for Lambda. Valid options are ssm or s3. Default is ssm."
-  type        = string
-  default     = "ssm"
-  validation {
-    condition = can(regex("^(ssm|s3)$", var.config_storage_type))
-    error_message = "config_storage_type must be either 'ssm' or 's3'"
-  }
-}
-
 variable "config_path" {
-  description = "Custom path to the YACE config file in the chosen storage service."
+  description = "Custom S3 path for the YACE config file."
   default     = ""
 }
