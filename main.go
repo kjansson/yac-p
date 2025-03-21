@@ -86,6 +86,9 @@ func HandleRequest() {
 		panic(err)
 	}
 
+	// Create prometheus timestamp
+	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
+
 	gMetrics, err := registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		panic(err)
@@ -93,6 +96,7 @@ func HandleRequest() {
 
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series
 	var oldTs int64
+	timestamped := false
 	// Process metrics into timeseries format that remote write expects
 	for _, fam := range gMetrics { // Range through metric types
 		metricName, metricType := fam.GetName(), fam.GetType() // Extraxt the metric type and name to use in prometheus time series
@@ -112,14 +116,24 @@ func HandleRequest() {
 			if err != nil {
 				panic(err)
 			}
-			timeStamp := metric.GetTimestampMs() // Extract the timestamp of the metric
-			if timeStamp == 0 {                  // The helper metrics does not have a timestamp, so we need to create one by storing the metric timestamps
-				timeStamp = oldTs
+
+			timestamp := metric.GetTimestampMs() // Extract the timestamp of the metric
+			// Metrics can have timestamps from Cloudwatch if YACE is configured to use them.
+			// If the metric does not have a timestamp, it's either a helper metric created by YACE or YACE is configured to ignore Cloudwatch timestamps.
+			// We store the timestamp of the first metric if it's non-zero and use it for the helper metrics,
+			// if the first metric is not timestamped we assume that YACE is configured to ignore Cloduwatch metrics and generate our own.
+			if timestamp == 0 {
+				if timestamped {
+					timestamp = oldTs
+				} else {
+					timestamp = newTimestamp
+				}
 			} else {
-				oldTs = timeStamp
+				oldTs = timestamp
+				timestamped = true
 			}
 
-			ts.Samples = append(ts.Samples, prompb.Sample{Value: value, Timestamp: timeStamp}) // Create prometheus time series samples
+			ts.Samples = append(ts.Samples, prompb.Sample{Value: value, Timestamp: timestamp}) // Create prometheus time series samples
 			timeSeries = append(timeSeries, ts)
 
 		}
