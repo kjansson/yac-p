@@ -8,8 +8,8 @@ resource "aws_lambda_function" "this" {
     variables = {
       PROMETHEUS_REMOTE_WRITE_URL = var.create_amp_workspace ? "${aws_prometheus_workspace.this.0.prometheus_endpoint}api/v1/remote_write" : var.prometheus_endpoint
       PROMETHEUS_REGION           = var.prometheus_region
-      CONFIG_S3_PATH            = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
-      CONFIG_S3_BUCKET = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
+      CONFIG_S3_PATH              = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
+      CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
       AUTH_TYPE                   = "AWS"
     }
   }
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "this" {
     system_log_level = var.lambda_log_level
   }
   timeout = var.lambda_timeout_seconds
-  tags = var.tags
+  tags    = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {

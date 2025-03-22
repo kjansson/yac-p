@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_object" "config" {
-    key = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
-    bucket = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
-    content = local.config_file_contents
+  key     = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
+  bucket  = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
+  content = local.config_file_contents
 }
