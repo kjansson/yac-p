@@ -8,12 +8,6 @@ https://github.com/prometheus-community/yet-another-cloudwatch-exporter
 YAC-p utilizes Go libraries from YACE to collect and convert Cloudwatch metrics into Prometheus format remote write format and writes to your endpoint of choice.  
 It runs as a Lambda function and only requires AWS managed services to run (You don't have to host anything!).   
 
-## Deployment
-
-- Build the image and push to ECR
-- Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md)
-- Deploy with included Terraform code
-
 ## Purpose
 
 YAC-p fits in wherever you don't want to do metrics scraping to get access to your Cloudwatch metrics in Prometheus.   
@@ -36,6 +30,20 @@ There are multiple scenarios where push-based metrics collection might be more s
 YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver AWS Cloudwatch metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully managed collection process.
 
 ![Deployment](img/deployment.png)
+
+## Instructions
+- Build the image and push to ECR
+- Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md)
+- Deploy with included Terraform code
+
+## Lambda configuration
+The included Terraform code will configure the Lambda for you, but if you want to deploy it yourself there are a few environment variables to set;
+
+- PROMETHEUS_REMOTE_WRITE_URL - The URL of the Prometheus remote write endpoint
+- PROMETHEUS_REGION - If using AMP, the region needs to be configured
+- CONFIG_S3_BUCKET - The S3 bucket where the config file is stored
+- CONFIG_S3_PATH - The path of the config file
+- AUTH_TYPE - Authentication type to use for the remote write endpoint. Valid options are "AWS", "BASIC", "TOKEN. Leave empty if no authentication is required.
 
 ## Deployment comparison to YACE
 

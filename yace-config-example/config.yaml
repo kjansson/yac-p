@@ -4,6 +4,8 @@ discovery:
   exportedTagsOnMetrics:
     AWS/EC2:
       - Test
+    AWS/Lambda:
+      - Environment
   jobs:
     - type: AWS/EC2
       regions: 
@@ -14,9 +16,6 @@ discovery:
         - name: NetworkOut
         - name: EBSReadOps
         - name: EBSWriteOps
-      searchTags:
-        - key: Test
-          value: Test1
       dimensionNameRequirements:
         - InstanceId
       includeContextOnInfoMetrics: true
@@ -24,4 +23,25 @@ discovery:
         - Average
       period: 300
       length: 300
-      addCloudwatchTimestamp: true
+    - type: AWS/Lambda
+      regions: 
+        - eu-north-1
+      metrics:
+        - name: Invocations
+          statistics: [Sum]
+        - name: Errors
+          statistics: [Sum]
+        - name: Throttles
+          statistics: [Sum]
+        - name: Duration
+          statistics: [Average, Maximum, Minimum, p90]
+      searchTags:
+        - key: Environment
+          value: POC
+      dimensionNameRequirements:
+        - FunctionName
+      includeContextOnInfoMetrics: true
+      statistics:
+        - Average
+      period: 300
+      length: 300

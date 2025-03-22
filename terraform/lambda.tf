@@ -18,7 +18,8 @@ resource "aws_lambda_function" "this" {
     log_format       = "JSON"
     system_log_level = var.lambda_log_level
   }
-  timeout = 15
+  timeout = var.lambda_timeout_seconds
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {

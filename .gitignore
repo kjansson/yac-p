@@ -2,3 +2,5 @@ terraform/.terraform*
 terraform/plan
 terraform/terraform.tfstate*
 terraform/terraform.tfvars
+
+build.sh

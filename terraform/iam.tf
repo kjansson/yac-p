@@ -26,9 +26,10 @@ data "aws_iam_policy_document" "eventbridge_invoke_lambda" {
       "lambda:InvokeFunction",
       "lambda:GetFunctionConfiguration",
     ]
-    resources = ["*"]
+    resources = [
+      aws_lambda_function.this.arn,
+    ]
   }
-
 }
 
 resource "aws_iam_role_policy" "eventbridge_invoke_lambda" {
@@ -72,7 +73,9 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
-    resources = ["*"]
+    resources = [
+      "${aws_cloudwatch_log_group.lambda.arn}:*"
+    ]
   }
   statement {
     effect = "Allow"
@@ -88,7 +91,9 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
       "ecr:BatchGetImage",
       "ecr:BatchCheckLayerAvailability"
     ]
-    resources = [var.lambda_image_repository_arn]
+    resources = [
+      var.lambda_image_repository_arn
+    ]
   }
   statement {
     effect = "Allow"
@@ -109,7 +114,7 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
       "storagegateway:ListTagsForResource",
       "iam:ListAccountAliases"
     ]
-    resources = ["*"]
+    resources = ["*"] // Needed for discovery
   }
 }
 
@@ -123,12 +128,12 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
   policy_arn = aws_iam_policy.lambda_exec_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_fa_policy" {
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_read" {
   role       = aws_iam_role.lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_prom_access" {
+resource "aws_iam_role_policy_attachment" "lambda_prom_write" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
 }

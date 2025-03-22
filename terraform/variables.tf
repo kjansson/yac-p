@@ -66,6 +66,12 @@ variable "lambda_schedule_rate" {
   default     = 5
 }
 
+variable "lambda_timeout_seconds" {
+  description = "The timeout for the Lambda function in seconds."
+  type        = number
+  default     = 15
+}
+
 variable "config_file_local_path" {
   description = "Path to the local YACE config file to upload and use."
   type        = string

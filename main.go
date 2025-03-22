@@ -37,14 +37,13 @@ func main() {
 func HandleRequest() {
 
 	ctx := context.Background()
-	logger := logging.NewLogger("debug", false)
+	logger := logging.NewLogger("", false)
 
 	if os.Getenv("PROMETHEUS_REMOTE_WRITE_URL") == "" {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
 	}
 
-	configS3Path := os.Getenv("CONFIG_S3_PATH")
-	configS3Bucket := os.Getenv("CONFIG_S3_BUCKET")
+	configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
 
 	if configS3Bucket != "" && configS3Path != "" {
 		sess, err := createAWSSession()
@@ -63,12 +62,13 @@ func HandleRequest() {
 		if err != nil {
 			panic(err)
 		}
+		// Write the configuration to a ephemeral storage, this is needed since the config package expects a file path
 		err = os.WriteFile(configFilePath, content, 0644)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		panic("No valid configuration options given. Please provide CONFIG_S3_BUCKET and CONFIG_S3_PATH.")
+		panic("CONFIG_S3_BUCKET and CONFIG_S3_PATH is required.")
 	}
 
 	config := config.ScrapeConf{} // Create a new scrape config
@@ -94,30 +94,28 @@ func HandleRequest() {
 	// Create prometheus timestamp
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
 
-	gMetrics, err := registry.Gather() // Gather the metrics from the prometheus registry
+	metrics, err := registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		panic(err)
 	}
 
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series
-	var oldTs int64
+	var oldTimestamp int64
 	timestamped := false
 	// Process metrics into timeseries format that remote write expects
-	for _, fam := range gMetrics { // Range through metric types
-		metricName, metricType := fam.GetName(), fam.GetType() // Extraxt the metric type and name to use in prometheus time series
+	for _, family := range metrics { // Range through metric types
+		metricName, metricType := family.GetName(), family.GetType() // Extraxt the metric type and name to use in prometheus time series
 
-		for _, metric := range fam.GetMetric() { // Range through the metrics of the metric type
+		for _, metric := range family.GetMetric() { // Range through the metrics of the metric type
 			ts := prompb.TimeSeries{}
 
-			labels := metric.GetLabel() // Extract the labels of the metric
-			for _, label := range labels {
-				lv := label.GetValue()
-				ts.Labels = append(ts.Labels, prompb.Label{Name: label.GetName(), Value: lv}) // Create prometheus time series labels
+			for _, label := range metric.GetLabel() {
+				ts.Labels = append(ts.Labels, prompb.Label{Name: label.GetName(), Value: label.GetValue()}) // Create prometheus time series labels
 			}
 			// This one is special, we need to add the metric name in the special label that prometheus expects
 			ts.Labels = append(ts.Labels, prompb.Label{Name: "__name__", Value: metricName})
 
-			value, err := getValue(metricType.String(), metric) // Extract the value of the metric based on the metric type
+			value, err := getValue(metricType, metric) // Extract the value of the metric based on the metric type
 			if err != nil {
 				panic(err)
 			}
@@ -126,41 +124,41 @@ func HandleRequest() {
 			// Metrics can have timestamps from Cloudwatch if YACE is configured to use them.
 			// If the metric does not have a timestamp, it's either a helper metric created by YACE or YACE is configured to ignore Cloudwatch timestamps.
 			// We store the timestamp of the first metric if it's non-zero and use it for the helper metrics,
-			// if the first metric is not timestamped we assume that YACE is configured to ignore Cloduwatch metrics and generate our own.
+			// if the first metric is not timestamped we assume that YACE is configured to ignore Cloduwatch timestamps and generate our own.
 			if timestamp == 0 {
 				if timestamped {
-					timestamp = oldTs
+					timestamp = oldTimestamp
 				} else {
 					timestamp = newTimestamp
 				}
 			} else {
-				oldTs = timestamp
+				oldTimestamp = timestamp
 				timestamped = true
 			}
 
 			ts.Samples = append(ts.Samples, prompb.Sample{Value: value, Timestamp: timestamp}) // Create prometheus time series samples
 			timeSeries = append(timeSeries, ts)
-
 		}
 	}
-
 	err = sendRequest(timeSeries) // Send the timeseries to the remote write endpoint
 	if err != nil {
 		panic(err)
 	}
 }
 
-func getValue(valueType string, metric *io_prometheus_client.Metric) (float64, error) {
+// getValue extracts the value of the metric based on the metric type
+func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_client.Metric) (float64, error) {
 	switch valueType {
-	case "GAUGE":
+	case io_prometheus_client.MetricType_GAUGE:
 		return *metric.Gauge.Value, nil
-	case "COUNTER":
+	case io_prometheus_client.MetricType_COUNTER:
 		return *metric.Counter.Value, nil
 	default:
 		return 0, fmt.Errorf("unknown metric type: %s", valueType)
 	}
 }
 
+// sendRequest sends the timeseries to the remote write endpoint
 func sendRequest(ts []prompb.TimeSeries) error {
 
 	authType := os.Getenv("AUTH_TYPE")
@@ -191,7 +189,6 @@ func sendRequest(ts []prompb.TimeSeries) error {
 		}
 
 		roleArn := os.Getenv("AWS_ROLE_ARN")
-
 		var awsCredentials *credentials.Credentials
 		if roleArn != "" {
 			awsCredentials = stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
@@ -209,7 +206,6 @@ func sendRequest(ts []prompb.TimeSeries) error {
 		if err != nil {
 			return err
 		}
-
 	case "BASIC":
 		req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 	case "TOKEN":
@@ -227,6 +223,7 @@ func sendRequest(ts []prompb.TimeSeries) error {
 	return nil
 }
 
+// createAWSSession creates a new AWS session
 func createAWSSession() (*session.Session, error) {
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
