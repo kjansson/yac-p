@@ -4,3 +4,5 @@ terraform/terraform.tfstate*
 terraform/terraform.tfvars
 
 build.sh
+
+.pre-commit-config.yaml
