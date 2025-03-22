@@ -44,7 +44,6 @@ func HandleRequest() {
 	}
 
 	configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
-
 	if configS3Bucket != "" && configS3Path != "" {
 		sess, err := createAWSSession()
 		if err != nil {
