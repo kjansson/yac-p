@@ -81,6 +81,10 @@ func HandleRequest() {
 
 	registry := prometheus.NewRegistry() // Create a new prometheus registry
 
+	for _, metric := range yace.Metrics { // Register YACE internal metrics
+		registry.Register(metric)
+	}
+
 	// Create a new yace client factory
 	f, err := client.NewFactory(logger, conf, false)
 	if err != nil {
