@@ -93,3 +93,9 @@ variable "config_path" {
   description = "Custom S3 path for the YACE config file."
   default     = ""
 }
+
+variable "yace_options" {
+  description = "Additional options to pass to YACE libraries."
+  type        = map(string)
+  default     = {}
+}

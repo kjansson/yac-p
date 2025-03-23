@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -38,6 +39,8 @@ func HandleRequest() {
 
 	ctx := context.Background()
 	logger := logging.NewLogger("", false)
+
+	opts := getYaceOptions()
 
 	if os.Getenv("PROMETHEUS_REMOTE_WRITE_URL") == "" {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
@@ -85,7 +88,7 @@ func HandleRequest() {
 	}
 
 	// Query metrics and resources and update the prometheus registry
-	err = yace.UpdateMetrics(ctx, logger, conf, registry, f)
+	err = yace.UpdateMetrics(ctx, logger, conf, registry, f, opts...)
 	if err != nil {
 		panic(err)
 	}
@@ -233,3 +236,88 @@ func createAWSSession() (*session.Session, error) {
 	}
 	return sess, err
 }
+
+func getYaceOptions() []yace.OptionsFunc {
+	optFuncs := []yace.OptionsFunc{}
+
+	var cloudwatchPerApiConcurrencyLimit bool = false
+	var err error
+	perApiLimit := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED")
+	if perApiLimit != "" {
+		cloudwatchPerApiConcurrencyLimit, err = strconv.ParseBool(perApiLimit)
+		if err != nil {
+			panic(err)
+		}
+	}
+	metricsPerQuery := os.Getenv("YACE_METRICS_PER_QUERY")
+	if metricsPerQuery != "" {
+		val, err := strconv.Atoi(metricsPerQuery)
+		if err != nil {
+			panic(err)
+		}
+		optFuncs = append(optFuncs, yace.MetricsPerQuery(val))
+	}
+	taggingAPIConcurrency := os.Getenv("YACE_TAG_CONCURRENCY")
+	if taggingAPIConcurrency != "" {
+		val, err := strconv.Atoi(taggingAPIConcurrency)
+		if err != nil {
+			panic(err)
+		}
+		optFuncs = append(optFuncs, yace.TaggingAPIConcurrency(val))
+	}
+	if !cloudwatchPerApiConcurrencyLimit {
+		cloudWatchConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY")
+		if cloudWatchConcurrency != "" {
+			val, err := strconv.Atoi(cloudWatchConcurrency)
+			if err != nil {
+				panic(err)
+			}
+			optFuncs = append(optFuncs, yace.CloudWatchAPIConcurrency(val))
+		}
+	} else {
+		limits := yace.DefaultCloudwatchConcurrency
+		cloudWatchListMetricsConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT")
+		if cloudWatchListMetricsConcurrency != "" {
+			val, err := strconv.Atoi(cloudWatchListMetricsConcurrency)
+			if err != nil {
+				panic(err)
+			}
+			limits.ListMetrics = val
+		}
+		cloudWatchGetMetricDataConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT")
+		if cloudWatchGetMetricDataConcurrency != "" {
+			val, err := strconv.Atoi(cloudWatchGetMetricDataConcurrency)
+			if err != nil {
+				panic(err)
+			}
+			limits.GetMetricData = val
+		}
+		cloudWatchGetMetricStatisticsConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT")
+		if cloudWatchGetMetricStatisticsConcurrency != "" {
+			val, err := strconv.Atoi(cloudWatchGetMetricStatisticsConcurrency)
+			if err != nil {
+				panic(err)
+			}
+			limits.GetMetricStatistics = val
+		}
+		optFuncs = append(optFuncs, yace.CloudWatchPerAPILimitConcurrency(limits.ListMetrics, limits.GetMetricData, limits.GetMetricStatistics))
+	}
+
+	return optFuncs
+}
+
+// const (
+// 	DefaultMetricsPerQuery       = 500
+// 	DefaultLabelsSnakeCase       = false
+// 	DefaultTaggingAPIConcurrency = 5
+// )
+
+// var DefaultCloudwatchConcurrency = cloudwatch.ConcurrencyConfig{
+// 	SingleLimit:        5,
+// 	PerAPILimitEnabled: false,
+
+// 	// If PerAPILimitEnabled is enabled, then use the same limit as the single limit by default.
+// 	ListMetrics:         5,
+// 	GetMetricData:       5,
+// 	GetMetricStatistics: 5,
+// }
