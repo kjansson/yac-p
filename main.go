@@ -305,19 +305,3 @@ func getYaceOptions() []yace.OptionsFunc {
 
 	return optFuncs
 }
-
-// const (
-// 	DefaultMetricsPerQuery       = 500
-// 	DefaultLabelsSnakeCase       = false
-// 	DefaultTaggingAPIConcurrency = 5
-// )
-
-// var DefaultCloudwatchConcurrency = cloudwatch.ConcurrencyConfig{
-// 	SingleLimit:        5,
-// 	PerAPILimitEnabled: false,
-
-// 	// If PerAPILimitEnabled is enabled, then use the same limit as the single limit by default.
-// 	ListMetrics:         5,
-// 	GetMetricData:       5,
-// 	GetMetricStatistics: 5,
-// }
