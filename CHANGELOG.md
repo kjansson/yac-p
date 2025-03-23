@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/kjansson/yac-p/compare/v0.2.0...v0.3.0) (2025-03-23)
+
+
+### Features
+
+* enable internal metrics ([#5](https://github.com/kjansson/yac-p/issues/5)) ([6a54f8e](https://github.com/kjansson/yac-p/commit/6a54f8efb666c20a0a58653f8700ea23bc84962f))
+
 ## [0.2.0](https://github.com/kjansson/yac-p/compare/v0.1.0...v0.2.0) (2025-03-23)
 
 
