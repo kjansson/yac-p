@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/kjansson/yac-p/compare/v0.1.0...v0.2.0) (2025-03-23)
+
+
+### Features
+
+* extend concurrency configuration ([c4c8ae2](https://github.com/kjansson/yac-p/commit/c4c8ae20ea79fed851b7558330867f02bc9b12d8))
+
 ## [0.1.0](https://github.com/kjansson/yac-p/compare/v0.0.2...v0.1.0) (2025-03-22)
 
 
