@@ -6,3 +6,5 @@ terraform/terraform.tfvars
 build.sh
 
 .pre-commit-config.yaml
+
+config.yaml

@@ -3,7 +3,7 @@ sts-region: us-east-1
 discovery:
   exportedTagsOnMetrics:
     AWS/EC2:
-      - Test
+      - Environment
     AWS/Lambda:
       - Environment
   jobs:
@@ -35,9 +35,6 @@ discovery:
           statistics: [Sum]
         - name: Duration
           statistics: [Average, Maximum, Minimum, p90]
-      searchTags:
-        - key: Environment
-          value: POC
       dimensionNameRequirements:
         - FunctionName
       includeContextOnInfoMetrics: true

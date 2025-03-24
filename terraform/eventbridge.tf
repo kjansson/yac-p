@@ -6,7 +6,7 @@ module "scheduler" {
   rules = {
     format("%s-cron", var.name_prefix) = {
       description         = format("%s-cron invoker", var.name_prefix)
-      schedule_expression = "rate(5 minutes)"
+      schedule_expression = var.eventbridge_schedule_expression
     }
   }
 

@@ -99,3 +99,9 @@ variable "yace_options" {
   type        = map(string)
   default     = {}
 }
+
+variable "eventbridge_schedule_expression" {
+  description = "The schedule expression for the EventBridge rule."
+  type        = string
+  default     = "rate(5 minutes)"
+}
