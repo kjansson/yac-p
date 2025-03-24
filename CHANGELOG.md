@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/kjansson/yac-p/compare/v0.3.0...v0.3.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* make schedule expression configurable through variable ([d21cbcb](https://github.com/kjansson/yac-p/commit/d21cbcbbd0c65feda1a5845d45a1c462678a6a8d))
+
 ## [0.3.0](https://github.com/kjansson/yac-p/compare/v0.2.0...v0.3.0) (2025-03-23)
 
 
