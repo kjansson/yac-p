@@ -45,16 +45,6 @@ variable "prometheus_region" {
   default = ""
 }
 
-variable "lambda_image_uri" {
-  description = "The URI of the Lambda function image."
-  type        = string
-}
-
-variable "lambda_image_repository_arn" {
-  description = "The ARN of the Lambda function image repository."
-  type        = string
-}
-
 variable "lambda_log_level" {
   description = "The log level for the Lambda function."
   type        = string

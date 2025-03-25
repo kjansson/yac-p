@@ -89,19 +89,6 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:DescribeImages",
-      "ecr:DescribeRepositories",
-    ]
-    resources = [
-      var.lambda_image_repository_arn
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
       "tag:GetResources",
       "cloudwatch:GetMetricData",
       "cloudwatch:GetMetricStatistics",

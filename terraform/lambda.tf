@@ -1,8 +1,34 @@
+resource "random_pet" "always" { # Dummy resource to trigger go build
+  length  = 2
+  keepers = {
+    always_run = timestamp()
+  }
+}
+
+resource "null_resource" "build" {
+  triggers = {
+    always_trigger = random_pet.always.id
+  }
+  provisioner "local-exec" {
+    command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../"
+  }
+}
+
+data "archive_file" "this" {
+  depends_on = [null_resource.build]
+
+  type        = "zip"
+  source_file = "../bootstrap"
+  output_path = "../yac-p.zip"
+}
+
 resource "aws_lambda_function" "this" {
   function_name = format("%s-lambda", var.name_prefix)
   role          = aws_iam_role.lambda.arn
-  package_type  = "Image"
-  image_uri     = var.lambda_image_uri
+  handler       = "bootstrap"
+  filename =    "../yac-p.zip"
+  runtime       = "provided.al2"
+  architectures = ["arm64"]
 
   environment {
     variables = merge({
@@ -21,6 +47,7 @@ resource "aws_lambda_function" "this" {
   }
   timeout = var.lambda_timeout_seconds
   tags    = var.tags
+  depends_on = [ data.archive_file.this ]
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
