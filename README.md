@@ -1,6 +1,6 @@
 # YAC-p
 
-YAC-p (Yet Another Cloudwatch Pusher) is heavily <b>(heavily)</b> utilizing YACE Go packages (Yet Another Cloudwatch Exporter)  
+YAC-p (Yet Another Cloudwatch Pusher) is utilizing YACE Go packages (Yet Another Cloudwatch Exporter)  
 https://github.com/prometheus-community/yet-another-cloudwatch-exporter
 
 <u>Note: This is a work in progress.</u>
@@ -17,24 +17,24 @@ There are multiple scenarios where push-based metrics collection might be more s
 
 - <b>Network access</b> - Scraping through Firewalls or other network access control mechanism can be a hassle. Providing endpoints for push-based metrics delivery simplifies things.
 
-- <b>Closer to real-time</b> - Instead of relying on the timing of an exporter and a scraping job, YAC-p delivers as fresh metrics as you want and Cloudwatch can manage to collect.  
-
 ## Features
 
 - <b>Nothing to host</b> - Can run on fully managed AWS infrastructure, Eventbridge + Lambda + Amazon managed Prometheus (Works with your self-hosted Prometheus as well)
-- <b>Yace compatible</b> - Uses YACE native job configurations and its amazing discovery and metric enrichment features
+- <b>YACE compatible</b> - Uses YACE native configuration and its amazing discovery and metric enrichment features
 - <b>Manage Prometheus the way you want (or not)</b> - Authentication options for Amazon Managed Prometheus, self-hosted Prometheus, etc
+- <b>Full cross account functionality</b> - Collect metrics in one account and store in another. Or collect metrics cross account. Whatever floats your boat. 
+- <b>Closer to real-time</b> - Instead of relying on the timing of an exporter and a scraping job, YAC-p delivers as fresh metrics as you want and Cloudwatch can manage to collect.
 
 ## Deployment
 
 YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver AWS Cloudwatch metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully AWS managed collection process.  
-The included Terraform example code deploys everything you need including a Amazon Managed Prometheus workspace.
+The included Terraform example code can deploy everything you need including a Amazon Managed Prometheus workspace.
 
 ![Deployment](img/deployment.png)
 
 ## Try it out
 - Build the image and push to ECR
-- Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md) or use the included example
+- Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md) or try the included example for EC2
 - Deploy with included Terraform code
 
 ## Lambda configuration
@@ -53,12 +53,3 @@ Concurrency settings normally passed to YACE via command line flags can be manag
 Each flag controlling concurrency has a corresponding environment variable, in screaming snake case with the prefix "YACE".  
 Example: the flag "cloudwatch-concurrency" can be controlled through "YACE_CLOUDWATCH_CONCURRENCY".
 
-## Deployment comparison to YACE
-
-YACE is awesome, but it usually requires something to host it. That might be something that you are trying to avoid. It can also introduce latency into the metric collection process, since it requires two unsynchronized collections of the metrics before it ends up in Prometheus.  
-
-![YACE](img/YACE.png)
-
-YAC-p fits better where you want to manage as little infrastructure as possible. It can also reduce latency in the metrics collection process, since it queries Cloudwatch at you desired rate and delivers metrics instantly to Prometheus.
-
-![YAC-p](img/YAC-p.png)
