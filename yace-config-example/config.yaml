@@ -8,6 +8,8 @@ discovery:
       - Environment
   jobs:
     - type: AWS/EC2
+      roles:
+        - arn:aws:iam::390844765215:role/org-observability
       regions: 
         - eu-north-1
       metrics:
@@ -18,25 +20,6 @@ discovery:
         - name: EBSWriteOps
       dimensionNameRequirements:
         - InstanceId
-      includeContextOnInfoMetrics: true
-      statistics:
-        - Average
-      period: 300
-      length: 300
-    - type: AWS/Lambda
-      regions: 
-        - eu-north-1
-      metrics:
-        - name: Invocations
-          statistics: [Sum]
-        - name: Errors
-          statistics: [Sum]
-        - name: Throttles
-          statistics: [Sum]
-        - name: Duration
-          statistics: [Average, Maximum, Minimum, p90]
-      dimensionNameRequirements:
-        - FunctionName
       includeContextOnInfoMetrics: true
       statistics:
         - Average
