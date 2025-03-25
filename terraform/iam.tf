@@ -89,7 +89,9 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions = [
       "ecr:GetDownloadUrlForLayer",
       "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability"
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories",
     ]
     resources = [
       var.lambda_image_repository_arn
