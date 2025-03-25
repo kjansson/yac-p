@@ -11,6 +11,7 @@ resource "aws_lambda_function" "this" {
       CONFIG_S3_PATH              = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
       CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
       AUTH_TYPE                   = "AWS"
+      AWS_ROLE_ARN                = var.prometheus_remote_write_role_arn
     }, var.yace_options)
   }
   logging_config {

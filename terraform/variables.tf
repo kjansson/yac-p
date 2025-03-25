@@ -111,3 +111,9 @@ variable "assumable_roles" {
   type        = list(string)
   default     = []
 }
+
+variable "prometheus_remote_write_role_arn" {
+  description = "The ARN of the IAM role to use to remote write to Prometheus (AMP only)."
+  type        = string
+  default     = ""
+}
