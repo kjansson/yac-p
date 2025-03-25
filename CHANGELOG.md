@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/kjansson/yac-p/compare/v0.3.1...v0.4.0) (2025-03-25)
+
+
+### Features
+
+* add variable controlling assumable roles ([#8](https://github.com/kjansson/yac-p/issues/8)) ([b27cdeb](https://github.com/kjansson/yac-p/commit/b27cdeb3f5f7998d79d64a6d38b0abc23886f738))
+
 ## [0.3.1](https://github.com/kjansson/yac-p/compare/v0.3.0...v0.3.1) (2025-03-24)
 
 
