@@ -1,5 +1,4 @@
 apiVersion: v1alpha1
-sts-region: us-east-1
 discovery:
   exportedTagsOnMetrics:
     AWS/EC2:

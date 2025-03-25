@@ -7,7 +7,7 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = merge({
       PROMETHEUS_REMOTE_WRITE_URL = var.create_amp_workspace ? "${aws_prometheus_workspace.this.0.prometheus_endpoint}api/v1/remote_write" : var.prometheus_endpoint
-      PROMETHEUS_REGION           = var.prometheus_region
+      PROMETHEUS_REGION           = var.prometheus_region == "" ? data.aws_region.current.name : var.prometheus_region
       CONFIG_S3_PATH              = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
       CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
       AUTH_TYPE                   = "AWS"

@@ -45,6 +45,7 @@ The included Terraform code will configure the Lambda for you, but if you want t
 - CONFIG_S3_BUCKET - The S3 bucket where the config file is stored
 - CONFIG_S3_PATH - The path of the config file
 - AUTH_TYPE - Authentication type to use for the remote write endpoint. Valid options are "AWS", "BASIC", "TOKEN. Leave empty if no authentication is required.
+- AWS_ROLE_ARN - Role to assume for writing metrics. Used only with Amazon Managed Prometheus when doing cross account writing.
 
 ## Advanced configuration
 Concurrency settings normally passed to YACE via command line flags can be managed through environment variables. Settings are documented here: [Flags](https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md#command-line-flags)

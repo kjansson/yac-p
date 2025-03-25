@@ -40,8 +40,9 @@ variable "prometheus_endpoint" {
 }
 
 variable "prometheus_region" {
-  description = "The region of the Prometheus workspace. Only used for Amazon Managed Prometheus."
+  description = "The region of the Prometheus workspace. Only used for Amazon Managed Prometheus. Defaults to current region."
   type        = string
+  default = ""
 }
 
 variable "lambda_image_uri" {
@@ -107,7 +108,7 @@ variable "eventbridge_schedule_expression" {
 }
 
 variable "assumable_roles" {
-  description = "List of IAM roles that can be assumed by the Lambda role."
+  description = "List of IAM role ARNs to add to IAM policy for Lambda to be able to assume. Used for cross-account access."
   type        = list(string)
   default     = []
 }
