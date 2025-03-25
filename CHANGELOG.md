@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0](https://github.com/kjansson/yac-p/compare/v0.4.0...v0.5.0) (2025-03-25)
+
+
+### Features
+
+* configurable remote write role ([10b26e7](https://github.com/kjansson/yac-p/commit/10b26e7315c570ffa08cf2f03668e64b5be7e760))
+
+
+### Bug Fixes
+
+* add correct ecr permissions ([f85060e](https://github.com/kjansson/yac-p/commit/f85060e05d799bff64fbf1b7da89e238be31efca))
+* condition on amp endpoint output ([672e73c](https://github.com/kjansson/yac-p/commit/672e73c02353de9a09af61dd908ed14cdde30e65))
+
 ## [0.4.0](https://github.com/kjansson/yac-p/compare/v0.3.1...v0.4.0) (2025-03-25)
 
 
