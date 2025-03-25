@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/kjansson/yac-p/compare/v0.5.0...v0.5.1) (2025-03-25)
+
+
+### Bug Fixes
+
+* remove need for amp region in config ([59ef67f](https://github.com/kjansson/yac-p/commit/59ef67fe1a349ccfe684b97c35a26fa97c6ab9b0))
+* tighten down s3 policy ([d830740](https://github.com/kjansson/yac-p/commit/d8307400a206f8806a91a516ddcba77fba712292))
+
 ## [0.5.0](https://github.com/kjansson/yac-p/compare/v0.4.0...v0.5.0) (2025-03-25)
 
 
