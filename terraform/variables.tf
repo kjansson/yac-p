@@ -105,3 +105,9 @@ variable "eventbridge_schedule_expression" {
   type        = string
   default     = "rate(5 minutes)"
 }
+
+variable "assumable_roles" {
+  description = "List of IAM roles that can be assumed by the Lambda role."
+  type        = list(string)
+  default     = []
+}

@@ -116,6 +116,17 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     ]
     resources = ["*"] // Needed for discovery
   }
+
+  dynamic "statement" {
+    for_each = length(var.assumable_roles) > 0 ? [1] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "sts:AssumeRole"
+      ]
+      resources = var.assumable_roles
+    }
+  }
 }
 
 resource "aws_iam_policy" "lambda_exec_policy" {
