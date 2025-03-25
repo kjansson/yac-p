@@ -82,7 +82,9 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions = [
       "s3:GetObject",
     ]
-    resources = ["*"]
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*"
+    ]
   }
   statement {
     effect = "Allow"
