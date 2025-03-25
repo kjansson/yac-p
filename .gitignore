@@ -8,3 +8,6 @@ build.sh
 .pre-commit-config.yaml
 
 config.yaml
+
+bootstrap
+yac-p.zip

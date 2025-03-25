@@ -33,7 +33,6 @@ The included Terraform example code can deploy everything you need including a A
 ![Deployment](img/deployment.png)
 
 ## Try it out
-- Build the image and push to ECR
 - Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md) or try the included example for EC2
 - Deploy with included Terraform code
 
