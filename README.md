@@ -1,10 +1,9 @@
 # YAC-p
 
-YAC-p (Yet Another Cloudwatch Pusher) is utilizing YACE Go packages (Yet Another Cloudwatch Exporter)  
-https://github.com/prometheus-community/yet-another-cloudwatch-exporter
-
 YAC-p utilizes Go libraries from YACE to collect and convert Cloudwatch metrics into Prometheus format remote write format and writes to your endpoint of choice.  
 It runs as a Lambda function and only requires AWS managed services to run (You don't have to host anything!).   
+
+https://github.com/prometheus-community/yet-another-cloudwatch-exporter
 
 ## Purpose
 
