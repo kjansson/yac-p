@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/kjansson/yac-p/compare/v0.5.1...v0.6.0) (2025-03-25)
+
+
+### Features
+
+* move from using ecr image to al2 runtime ([#12](https://github.com/kjansson/yac-p/issues/12)) ([29e287a](https://github.com/kjansson/yac-p/commit/29e287aa9d357eb7156338b7b7bd32d2153c36f5))
+
 ## [0.5.1](https://github.com/kjansson/yac-p/compare/v0.5.0...v0.5.1) (2025-03-25)
 
 
