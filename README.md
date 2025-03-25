@@ -27,7 +27,7 @@ There are multiple scenarios where push-based metrics collection might be more s
 YAC-p can be deployed using fully managed services. Using Eventbridge to schedule the YAC-p Lambda function it will deliver AWS Cloudwatch metrics to any Prometheus server, but when using Amazon Managed Prometheus it becomes a fully AWS managed collection process.  
 The included Terraform example code can deploy everything you need including a Amazon Managed Prometheus workspace.
 
-![Deployment](img/deployment.png)
+![Deployment](img/deployment.svg)
 
 ## Try it out
 - Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md) or try the included example for EC2
