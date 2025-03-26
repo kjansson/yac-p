@@ -30,7 +30,7 @@ The included Terraform example code can deploy everything you need including a A
 ![Deployment](img/deployment.svg)
 
 ## Try it out
-- Write a YACE job config file (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md) or try the included example for EC2
+- Write a YACE job config file: [configuration](https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md), or try the included example for EC2
 - Deploy with included Terraform code
 
 ## Lambda configuration
@@ -49,5 +49,5 @@ AWS_ROLE_ARN - Role to assume for writing metrics. Used only with Amazon Managed
 Concurrency settings normally passed to YACE via command line flags can be managed through environment variables. Settings are documented here: [Flags](https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md#command-line-flags)
 
 Each flag controlling concurrency has a corresponding environment variable, in screaming snake case with the prefix "YACE".  
-Example: the flag "cloudwatch-concurrency" can be controlled through "YACE_CLOUDWATCH_CONCURRENCY".
+Example: the flag "cloudwatch-concurrency" can be controlled through ```YACE_CLOUDWATCH_CONCURRENCY```.
 
