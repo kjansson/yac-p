@@ -27,7 +27,7 @@ resource "aws_lambda_function" "this" {
   role          = aws_iam_role.lambda.arn
   handler       = "bootstrap"
   filename =    "../yac-p.zip"
-  runtime       = "provided.al2"
+  runtime       = var.lambda_runtime
   architectures = ["arm64"]
 
   environment {

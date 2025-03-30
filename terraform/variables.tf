@@ -113,3 +113,8 @@ variable "prometheus_auth_type" {
   type        = string
   default     = "aws4"
 }
+variable "lambda_runtime" {
+  description = "The runtime for the Lambda function."
+  type        = string
+  default     = "provided.al2"
+}
