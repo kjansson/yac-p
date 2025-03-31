@@ -98,13 +98,13 @@ variable "eventbridge_schedule_expression" {
 }
 
 variable "assumable_roles" {
-  description = "List of IAM role ARNs to add to IAM policy for Lambda to be able to assume. Used for cross-account access."
+  description = "List of IAM role ARNs to add to IAM policy for Lambda to be able to assume. Used for cross-account access. If a prometheus_remote_write_role_arn is provided, it will be added to this list automatically."
   type        = list(string)
   default     = []
 }
 
 variable "prometheus_remote_write_role_arn" {
-  description = "The ARN of the IAM role to use to remote write to Prometheus (AMP only)."
+  description = "The ARN of the IAM role to use to remote write to Prometheus (AMP only). Will be added to list of assumable roles if not already present."
   type        = string
   default     = ""
 }
