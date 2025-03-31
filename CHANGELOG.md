@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/kjansson/yac-p/compare/v0.6.0...v0.7.0) (2025-03-31)
+
+
+### Features
+
+* update to 0.62.1 libraries ([#15](https://github.com/kjansson/yac-p/issues/15)) ([df66158](https://github.com/kjansson/yac-p/commit/df66158a1887266063904372c4c23de431b27d48))
+
 ## [0.6.0](https://github.com/kjansson/yac-p/compare/v0.5.1...v0.6.0) (2025-03-25)
 
 
