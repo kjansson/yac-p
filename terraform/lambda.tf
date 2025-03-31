@@ -3,9 +3,9 @@ data "local_file" "lambda_go_file" {
 }
 
 resource "null_resource" "build" {
-   triggers = {
-     lambda_code = data.local_file.lambda_go_file.content
-   }
+  triggers = {
+    lambda_code = data.local_file.lambda_go_file.content
+  }
   provisioner "local-exec" {
     command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../"
   }
@@ -14,16 +14,16 @@ data "archive_file" "this" {
   type        = "zip"
   source_file = "../bootstrap"
   output_path = "../yac-p.zip"
-  depends_on = [null_resource.build]
+  depends_on  = [null_resource.build]
 }
 
 resource "aws_lambda_function" "this" {
-  function_name = format("%s-lambda", var.name_prefix)
-  role          = aws_iam_role.lambda.arn
-  handler       = "bootstrap"
-  filename =    "../yac-p.zip"
-  runtime       = var.lambda_runtime
-  architectures = ["arm64"]
+  function_name    = format("%s-lambda", var.name_prefix)
+  role             = aws_iam_role.lambda.arn
+  handler          = "bootstrap"
+  filename         = "../yac-p.zip"
+  runtime          = var.lambda_runtime
+  architectures    = ["arm64"]
   source_code_hash = data.archive_file.this.output_base64sha256
 
   environment {
@@ -34,7 +34,7 @@ resource "aws_lambda_function" "this" {
       CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
       AUTH_TYPE                   = var.create_amp_workspace ? "AWS" : var.prometheus_auth_type
       AWS_ROLE_ARN                = var.prometheus_remote_write_role_arn
-      DEBUG = var.lambda_debug
+      DEBUG                       = var.lambda_debug
     }, var.yace_options)
   }
   logging_config {
