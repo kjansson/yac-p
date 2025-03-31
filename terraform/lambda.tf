@@ -1,25 +1,20 @@
-resource "random_pet" "always" { # Dummy resource to trigger go build
-  length  = 2
-  keepers = {
-    always_run = timestamp()
-  }
+data "local_file" "lambda_go_file" {
+  filename = "../main.go"
 }
 
 resource "null_resource" "build" {
-  triggers = {
-    always_trigger = random_pet.always.id
-  }
+   triggers = {
+     lambda_code = data.local_file.lambda_go_file.content
+   }
   provisioner "local-exec" {
     command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../"
   }
 }
-
 data "archive_file" "this" {
-  depends_on = [null_resource.build]
-
   type        = "zip"
   source_file = "../bootstrap"
   output_path = "../yac-p.zip"
+  depends_on = [null_resource.build]
 }
 
 resource "aws_lambda_function" "this" {
@@ -29,6 +24,7 @@ resource "aws_lambda_function" "this" {
   filename =    "../yac-p.zip"
   runtime       = var.lambda_runtime
   architectures = ["arm64"]
+  source_code_hash = data.archive_file.this.output_base64sha256
 
   environment {
     variables = merge({
@@ -47,7 +43,6 @@ resource "aws_lambda_function" "this" {
   }
   timeout = var.lambda_timeout_seconds
   tags    = var.tags
-  depends_on = [ data.archive_file.this ]
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
