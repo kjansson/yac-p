@@ -108,3 +108,13 @@ variable "prometheus_remote_write_role_arn" {
   type        = string
   default     = ""
 }
+variable "prometheus_auth_type" {
+  description = "The authentication type to use for Prometheus remote write. Use when not using Amazon Managed Prometheus or other AWS authentication."
+  type        = string
+  default     = ""
+}
+variable "lambda_runtime" {
+  description = "The runtime for the Lambda function."
+  type        = string
+  default     = "provided.al2"
+}
