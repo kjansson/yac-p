@@ -52,7 +52,7 @@ func HandleRequest() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, logOpts))
 
-	opts := getYaceOptions()
+	opts := getYaceOptions(logger)
 
 	if os.Getenv("PROMETHEUS_REMOTE_WRITE_URL") == "" {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
@@ -268,13 +268,14 @@ func createAWSSession() (*session.Session, error) {
 	return sess, err
 }
 
-func getYaceOptions() []yace.OptionsFunc {
+func getYaceOptions(logger *slog.Logger) []yace.OptionsFunc {
 	optFuncs := []yace.OptionsFunc{}
 
 	var cloudwatchPerApiConcurrencyLimit bool = false
 	var err error
 	perApiLimit := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED")
 	if perApiLimit != "" {
+		logger.Debug("Using non-default per API concurrency limit", slog.String("per_api_limit", perApiLimit))
 		cloudwatchPerApiConcurrencyLimit, err = strconv.ParseBool(perApiLimit)
 		if err != nil {
 			panic(err)
@@ -282,6 +283,7 @@ func getYaceOptions() []yace.OptionsFunc {
 	}
 	metricsPerQuery := os.Getenv("YACE_METRICS_PER_QUERY")
 	if metricsPerQuery != "" {
+		logger.Debug("Using non-default metrics per query", slog.String("metrics_per_query", metricsPerQuery))
 		val, err := strconv.Atoi(metricsPerQuery)
 		if err != nil {
 			panic(err)
@@ -290,6 +292,7 @@ func getYaceOptions() []yace.OptionsFunc {
 	}
 	taggingAPIConcurrency := os.Getenv("YACE_TAG_CONCURRENCY")
 	if taggingAPIConcurrency != "" {
+		logger.Debug("Using non-default tagging API concurrency", slog.String("tagging_api_concurrency", taggingAPIConcurrency))
 		val, err := strconv.Atoi(taggingAPIConcurrency)
 		if err != nil {
 			panic(err)
@@ -299,6 +302,7 @@ func getYaceOptions() []yace.OptionsFunc {
 	if !cloudwatchPerApiConcurrencyLimit {
 		cloudWatchConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY")
 		if cloudWatchConcurrency != "" {
+			logger.Debug("Using non-default cloudwatch concurrency", slog.String("cloudwatch_concurrency", cloudWatchConcurrency))
 			val, err := strconv.Atoi(cloudWatchConcurrency)
 			if err != nil {
 				panic(err)
@@ -309,6 +313,7 @@ func getYaceOptions() []yace.OptionsFunc {
 		limits := yace.DefaultCloudwatchConcurrency
 		cloudWatchListMetricsConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT")
 		if cloudWatchListMetricsConcurrency != "" {
+			logger.Debug("Using non-default cloudwatch list metrics concurrency", slog.String("cloudwatch_list_metrics_concurrency", cloudWatchListMetricsConcurrency))
 			val, err := strconv.Atoi(cloudWatchListMetricsConcurrency)
 			if err != nil {
 				panic(err)
@@ -317,6 +322,7 @@ func getYaceOptions() []yace.OptionsFunc {
 		}
 		cloudWatchGetMetricDataConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT")
 		if cloudWatchGetMetricDataConcurrency != "" {
+			logger.Debug("Using non-default cloudwatch get metric data concurrency", slog.String("cloudwatch_get_metric_data_concurrency", cloudWatchGetMetricDataConcurrency))
 			val, err := strconv.Atoi(cloudWatchGetMetricDataConcurrency)
 			if err != nil {
 				panic(err)
@@ -325,6 +331,7 @@ func getYaceOptions() []yace.OptionsFunc {
 		}
 		cloudWatchGetMetricStatisticsConcurrency := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT")
 		if cloudWatchGetMetricStatisticsConcurrency != "" {
+			logger.Debug("Using non-default cloudwatch get metric statistics concurrency", slog.String("cloudwatch_get_metric_statistics_concurrency", cloudWatchGetMetricStatisticsConcurrency))
 			val, err := strconv.Atoi(cloudWatchGetMetricStatisticsConcurrency)
 			if err != nil {
 				panic(err)
