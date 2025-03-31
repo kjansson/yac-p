@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/kjansson/yac-p/compare/v0.7.0...v0.7.1) (2025-03-31)
+
+
+### Bug Fixes
+
+* debug logging ([#17](https://github.com/kjansson/yac-p/issues/17)) ([16cb9fc](https://github.com/kjansson/yac-p/commit/16cb9fc3bc625dd73b265810d0921118a31d11a3))
+
 ## [0.7.0](https://github.com/kjansson/yac-p/compare/v0.6.0...v0.7.0) (2025-03-31)
 
 
