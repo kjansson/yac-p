@@ -42,7 +42,7 @@ variable "prometheus_endpoint" {
 variable "prometheus_region" {
   description = "The region of the Prometheus workspace. Only used for Amazon Managed Prometheus. Defaults to current region."
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "lambda_log_level" {
