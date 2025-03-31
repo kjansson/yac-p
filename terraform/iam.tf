@@ -109,13 +109,14 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   }
 
   dynamic "statement" {
-    for_each = length(var.assumable_roles) > 0 ? [1] : []
+    for_each = length(var.assumable_roles) > 0 || var.prometheus_remote_write_role_arn != "" ? [1] : []
     content {
       effect = "Allow"
       actions = [
         "sts:AssumeRole"
       ]
-      resources = var.assumable_roles
+      # If prometheus_remote_write_role_arn is set, add it to the list of assumable roles if it's not already there
+      resources = var.prometheus_remote_write_role_arn != "" && !contains(var.assumable_roles, var.prometheus_remote_write_role_arn) ? concat(var.assumable_roles, [var.prometheus_remote_write_role_arn]) : var.assumable_roles
     }
   }
 }
