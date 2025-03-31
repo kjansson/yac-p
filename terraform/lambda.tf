@@ -32,7 +32,7 @@ resource "aws_lambda_function" "this" {
       PROMETHEUS_REGION           = var.prometheus_region == "" ? data.aws_region.current.name : var.prometheus_region
       CONFIG_S3_PATH              = var.config_path == "" ? format("%s-yace-config/config.yaml", var.name_prefix) : var.config_path
       CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
-      AUTH_TYPE                   = var.create_amp_workspace ? "aws4" : var.prometheus_auth_type
+      AUTH_TYPE                   = var.create_amp_workspace ? "AWS" : var.prometheus_auth_type
       AWS_ROLE_ARN                = var.prometheus_remote_write_role_arn
     }, var.yace_options)
   }
