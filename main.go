@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"log/slog"
+
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -21,7 +23,6 @@ import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
 	config "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/config"
-	logging "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
@@ -38,13 +39,26 @@ func main() {
 func HandleRequest() {
 
 	ctx := context.Background()
-	logger := logging.NewLogger("", false)
+
+	debugEnv := os.Getenv("DEBUG")
+	debug, _ := strconv.ParseBool(debugEnv)
+
+	logOpts := &slog.HandlerOptions{}
+	if debug {
+		logOpts.Level = slog.LevelDebug
+	} else {
+		logOpts.Level = slog.LevelInfo
+	}
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, logOpts))
 
 	opts := getYaceOptions()
 
 	if os.Getenv("PROMETHEUS_REMOTE_WRITE_URL") == "" {
 		panic("PROMETHEUS_REMOTE_WRITE_URL is required")
 	}
+
+	logger.Debug("Prometheus remote write URL", slog.String("url", os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")))
 
 	configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
 	if configS3Bucket != "" && configS3Path != "" {
