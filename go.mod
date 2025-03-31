@@ -6,15 +6,15 @@ toolchain go1.23.7
 
 require (
 	github.com/aws/aws-lambda-go v1.47.0
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/golang/snappy v0.0.4
-	github.com/prometheus-community/yet-another-cloudwatch-exporter v0.62.0
+	github.com/prometheus-community/yet-another-cloudwatch-exporter v0.62.1
 	github.com/prometheus/client_golang v1.21.0-rc.0
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/prometheus v0.302.1
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.55.6 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.7 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.28.7 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.48 // indirect
@@ -41,8 +41,6 @@ require (
 	github.com/aws/smithy-go v1.22.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/go-kit/log v0.2.1 // indirect
-	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/grafana/regexp v0.0.0-20240607082908-2cb410fa05da // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect

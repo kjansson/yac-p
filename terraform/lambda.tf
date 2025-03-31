@@ -34,6 +34,7 @@ resource "aws_lambda_function" "this" {
       CONFIG_S3_BUCKET            = var.create_config_file_bucket ? aws_s3_bucket.this[0].bucket : var.config_bucket
       AUTH_TYPE                   = var.create_amp_workspace ? "AWS" : var.prometheus_auth_type
       AWS_ROLE_ARN                = var.prometheus_remote_write_role_arn
+      DEBUG = var.lambda_debug
     }, var.yace_options)
   }
   logging_config {

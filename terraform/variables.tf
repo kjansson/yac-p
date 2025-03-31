@@ -118,3 +118,9 @@ variable "lambda_runtime" {
   type        = string
   default     = "provided.al2"
 }
+
+variable "lambda_debug" {
+  description = "Enable debug logging for the Lambda function."
+  type        = bool
+  default     = false
+}
