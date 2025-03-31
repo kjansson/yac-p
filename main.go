@@ -66,6 +66,7 @@ func HandleRequest() {
 		if err != nil {
 			panic(err)
 		}
+		logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
 		s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
 		obj, err := s3svc.GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(configS3Bucket),
@@ -113,6 +114,7 @@ func HandleRequest() {
 
 	// Create prometheus timestamp
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	logger.Debug("Timestamp", slog.Int64("timestamp", newTimestamp))
 
 	metrics, err := registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
@@ -125,7 +127,7 @@ func HandleRequest() {
 	// Process metrics into timeseries format that remote write expects
 	for _, family := range metrics { // Range through metric types
 		metricName, metricType := family.GetName(), family.GetType() // Extraxt the metric type and name to use in prometheus time series
-
+		logger.Debug("Processing metric", slog.String("metric_name", metricName), slog.String("metric_type", metricType.String()))
 		for _, metric := range family.GetMetric() { // Range through the metrics of the metric type
 			ts := prompb.TimeSeries{}
 
@@ -147,8 +149,10 @@ func HandleRequest() {
 			// if the first metric is not timestamped we assume that YACE is configured to ignore Cloduwatch timestamps and generate our own.
 			if timestamp == 0 {
 				if timestamped {
+					logger.Debug("Using stored timestamp from previous metric", slog.Int64("timestamp", oldTimestamp))
 					timestamp = oldTimestamp
 				} else {
+					logger.Debug("Using generated timestamp", slog.Int64("timestamp", newTimestamp))
 					timestamp = newTimestamp
 				}
 			} else {
@@ -160,7 +164,9 @@ func HandleRequest() {
 			timeSeries = append(timeSeries, ts)
 		}
 	}
-	err = sendRequest(timeSeries) // Send the timeseries to the remote write endpoint
+
+	logger.Debug("Sending timeseries", slog.Int("timeseries_count", len(timeSeries)))
+	err = sendRequest(timeSeries, logger) // Send the timeseries to the remote write endpoint
 	if err != nil {
 		panic(err)
 	}
@@ -179,9 +185,10 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 }
 
 // sendRequest sends the timeseries to the remote write endpoint
-func sendRequest(ts []prompb.TimeSeries) error {
+func sendRequest(ts []prompb.TimeSeries, logger *slog.Logger) error {
 
 	authType := os.Getenv("AUTH_TYPE")
+	logger.Debug("Auth type", slog.String("auth_type", authType))
 
 	r := &prompb.WriteRequest{
 		Timeseries: ts,
@@ -211,12 +218,14 @@ func sendRequest(ts []prompb.TimeSeries) error {
 		roleArn := os.Getenv("AWS_ROLE_ARN")
 		var awsCredentials *credentials.Credentials
 		if roleArn != "" {
+			logger.Debug("Using AWS role", slog.String("role_arn", roleArn))
 			awsCredentials = stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
 				host, err := os.Hostname()
 				if err != nil {
 					host = "unknown"
 				}
 				p.RoleSessionName = "aws-sigv4-proxy-" + host
+				logger.Debug("Using AWS role session name", slog.String("role_session_name", p.RoleSessionName))
 			})
 		} else {
 			awsCredentials = sess.Config.Credentials
@@ -227,8 +236,10 @@ func sendRequest(ts []prompb.TimeSeries) error {
 			return err
 		}
 	case "BASIC":
+		logger.Debug("Using basic auth")
 		req.SetBasicAuth(os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 	case "TOKEN":
+		logger.Debug("Using token auth")
 		req.Header.Set("Authorization", "Bearer "+os.Getenv("TOKEN"))
 	}
 
@@ -236,7 +247,9 @@ func sendRequest(ts []prompb.TimeSeries) error {
 	req.Header.Set("Content-Encoding", "snappy")
 	req.Header.Set("X-Prometheus-Remote-Write-Version", "0.1.0")
 
+	logger.Debug("Sending request", slog.String("url", os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")), slog.Int("body_size", len(encoded)))
 	response, err := http.DefaultClient.Do(req)
+	logger.Debug("Response", slog.String("status", response.Status), slog.Int("status_code", response.StatusCode))
 	if err != nil && response.StatusCode != http.StatusOK {
 		return err
 	}

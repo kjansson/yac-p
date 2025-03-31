@@ -43,6 +43,7 @@ CONFIG_S3_BUCKET - The S3 bucket where the config file is stored
 CONFIG_S3_PATH - The path of the config file
 AUTH_TYPE - Authentication type to use for the remote write endpoint. Valid options are "AWS", "BASIC", "TOKEN. Leave empty if no authentication is required.
 AWS_ROLE_ARN - Role to assume for writing metrics. Used only with Amazon Managed Prometheus when doing cross account remote writing.
+DEBUG - Enables/disables debug logging. Accepts any value accepted by strconv.ParseBool (1, t, T, TRUE, true, True, 0, f, F, FALSE, false, False), empty equals to false.
 ```
 
 ## Advanced configuration
