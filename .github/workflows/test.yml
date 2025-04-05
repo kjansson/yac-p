@@ -26,3 +26,14 @@ jobs:
       - uses: actions/setup-python@v2
       - uses: aws-actions/setup-sam@v1
       - run: sam build --template sam-template.yaml
+      - name: Copy binary
+        run: |
+          mv .aws-sam/build/yac-p/bootstrap yac-p
+      - name: Run
+        run: sam local invoke yacp -t sam-template.yaml
+        env: 
+          PROMETHEUS_REMOTE_WRITE_URL: http://localhost:9090/api/v1/write
+          AWS_ENDPOINT: http://localhost:4566
+          AWS_REGION: eu-north-1
+          CONFIG_S3_BUCKET: sample-bucket
+          CONFIG_S3_PATH: config.yaml
