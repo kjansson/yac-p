@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/kjansson/yac-p/compare/v0.7.1...v0.7.2) (2025-04-05)
+
+
+### Bug Fixes
+
+* remove the need for remote write role in assumable roles ([#19](https://github.com/kjansson/yac-p/issues/19)) ([17b9c19](https://github.com/kjansson/yac-p/commit/17b9c197b27edf3fd60a479d5c520b2df0da1f01))
+
 ## [0.7.1](https://github.com/kjansson/yac-p/compare/v0.7.0...v0.7.1) (2025-03-31)
 
 
