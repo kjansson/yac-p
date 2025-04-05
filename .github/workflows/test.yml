@@ -1,0 +1,41 @@
+
+on:
+    push:
+      branches:
+        - main
+    pull_request:
+  
+permissions:
+    contents: write
+    pull-requests: write
+
+name: yac-p-e2e-test
+jobs: 
+  localstack:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Start LocalStack
+      uses: LocalStack/setup-localstack@v0.2.3
+      with:
+          image-tag: 'latest'
+          install-awslocal: 'true'  
+  sam-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v5
+        with:
+            go-version: '1.24'
+      - uses: aws-actions/setup-sam@v1
+      - run: sam build --template sam-template.yaml
+      - name: Copy binary
+        run: |
+          mv .aws-sam/build/yacp/bootstrap yac-p
+      - name: Run
+        run: sam local invoke yacp -t sam-template.yaml
+        env: 
+          PROMETHEUS_REMOTE_WRITE_URL: http://localhost:9090/api/v1/write
+          AWS_ENDPOINT: http://localhost:4566
+          AWS_REGION: eu-north-1
+          CONFIG_S3_BUCKET: sample-bucket
+          CONFIG_S3_PATH: config.yaml
