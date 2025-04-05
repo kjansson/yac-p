@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/golang/snappy v1.0.0
 	github.com/prometheus-community/yet-another-cloudwatch-exporter v0.62.1
-	github.com/prometheus/client_golang v1.21.0-rc.0
+	github.com/prometheus/client_golang v1.22.0-rc.0
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/prometheus v0.302.1
 )
@@ -50,8 +50,8 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/protobuf v1.36.4 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
