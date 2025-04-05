@@ -7,7 +7,7 @@ resource "null_resource" "build" {
     lambda_code = data.local_file.lambda_go_file.content
   }
   provisioner "local-exec" {
-    command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../"
+    command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../yac-p"
   }
 }
 data "archive_file" "this" {
