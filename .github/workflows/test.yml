@@ -1,0 +1,28 @@
+
+on:
+    push:
+      branches:
+        - main
+    pull_request:
+  
+permissions:
+    contents: write
+    pull-requests: write
+
+name: yac-p-e2e-test
+jobs: 
+  localstack:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Start LocalStack
+      uses: LocalStack/setup-localstack@v0.2.3
+      with:
+          image-tag: 'latest'
+          install-awslocal: 'true'  
+  sam-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - run: sam build --template sam-template.yaml

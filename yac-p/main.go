@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -267,7 +269,23 @@ func createAWSSession() (*session.Session, error) {
 
 	endpoint := os.Getenv("AWS_ENDPOINT")
 	if endpoint != "" {
+
+		client := &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyFromEnvironment,
+				DialContext: func(ctx context.Context, network string, addr string) (net.Conn, error) {
+					return (&net.Dialer{}).DialContext(ctx, "tcp4", addr)
+				},
+			},
+		}
+
 		config.Endpoint = aws.String(endpoint)
+		config.DisableSSL = aws.Bool(true)
+		config.S3ForcePathStyle = aws.Bool(true)
+		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
+		config.UseDualStackEndpoint = endpoints.DualStackEndpointStateDisabled
+		config.UseDualStack = aws.Bool(false)
+		config.HTTPClient = client
 	}
 
 	sess, err := session.NewSessionWithOptions(session.Options{

@@ -15,13 +15,17 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: ./
+      CodeUri: yac-p/
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           PROMETHEUS_REMOTE_WRITE_URL: http://localhost:9090/api/v1/write
+          AWS_ENDPOINT: http://localhost:4566
+          AWS_REGION: eu-north-1
+          CONFIG_S3_BUCKET: sample-bucket
+          CONFIG_S3_PATH: config.yaml
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
