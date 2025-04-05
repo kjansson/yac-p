@@ -261,8 +261,17 @@ func sendRequest(ts []prompb.TimeSeries, logger *slog.Logger) error {
 
 // createAWSSession creates a new AWS session
 func createAWSSession() (*session.Session, error) {
+	config := aws.Config{
+		Region: aws.String(os.Getenv("AWS_REGION")),
+	}
+
+	endpoint := os.Getenv("AWS_ENDPOINT")
+	if endpoint != "" {
+		config.Endpoint = aws.String(endpoint)
+	}
+
 	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
+		Config:            config,
 		SharedConfigState: session.SharedConfigEnable,
 	})
 	if err != nil {
