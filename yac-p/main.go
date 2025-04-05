@@ -284,7 +284,6 @@ func createAWSSession() (*session.Session, error) {
 		config.S3ForcePathStyle = aws.Bool(true)
 		config.Credentials = credentials.NewStaticCredentials("test", "test", "")
 		config.UseDualStackEndpoint = endpoints.DualStackEndpointStateDisabled
-		config.UseDualStack = aws.Bool(false)
 		config.HTTPClient = client
 	}
 

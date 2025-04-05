@@ -23,13 +23,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-go@v5
+        with:
+            go-version: '1.24'
       - uses: aws-actions/setup-sam@v1
       - run: sam build --template sam-template.yaml
       - name: Copy binary
         run: |
-          ls .aws-sam/build/
-          ls .aws-sam/build/yacp
           mv .aws-sam/build/yacp/bootstrap yac-p
       - name: Run
         run: sam local invoke yacp -t sam-template.yaml
