@@ -97,7 +97,10 @@ func HandleRequest() {
 	registry := prometheus.NewRegistry() // Create a new prometheus registry
 
 	for _, metric := range yace.Metrics { // Register YACE internal metrics
-		registry.Register(metric)
+		err := registry.Register(metric)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// Create a new yace client factory
@@ -271,7 +274,7 @@ func createAWSSession() (*session.Session, error) {
 func getYaceOptions(logger *slog.Logger) []yace.OptionsFunc {
 	optFuncs := []yace.OptionsFunc{}
 
-	var cloudwatchPerApiConcurrencyLimit bool = false
+	var cloudwatchPerApiConcurrencyLimit bool
 	var err error
 	perApiLimit := os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED")
 	if perApiLimit != "" {
