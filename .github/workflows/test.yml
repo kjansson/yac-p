@@ -29,8 +29,8 @@ jobs:
       - name: Copy binary
         run: |
           ls .aws-sam/build/
-          ls .aws-sam/build/yac-p
-          mv .aws-sam/build/yac-p/bootstrap yac-p
+          ls .aws-sam/build/yacp
+          mv .aws-sam/build/yacp/bootstrap yac-p
       - name: Run
         run: sam local invoke yacp -t sam-template.yaml
         env: 
