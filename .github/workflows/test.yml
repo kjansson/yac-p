@@ -27,12 +27,12 @@ jobs:
         with:
             go-version: '1.24'
       - uses: aws-actions/setup-sam@v1
-      - run: sam build --template sam-template.yaml
+      - run: sam build --template sam-template.yaml --use-container
       - name: Copy binary
         run: |
           mv .aws-sam/build/yacp/bootstrap yac-p
       - name: Run
-        run: sam local invoke yacp -t sam-template.yaml
+        run: sam local invoke yacp -t sam-template.yaml 
         env: 
           PROMETHEUS_REMOTE_WRITE_URL: http://localhost:9090/api/v1/write
           AWS_ENDPOINT: http://localhost:4566
