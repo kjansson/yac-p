@@ -2,50 +2,29 @@ package main
 
 import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
+	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )
 
-type logger interface {
+type Logger interface {
 	Init() error
 	Log(level string, msg string, args ...any)
 }
 
-type metricGatherer interface {
+type MetricGatherer interface {
 	Init() error
-	CollectMetrics(logger, Config) error
-	ExtractMetrics(logger) ([]*io_prometheus_client.MetricFamily, error)
+	CollectMetrics(Logger, Config) error
+	ExtractMetrics(Logger) ([]*io_prometheus_client.MetricFamily, error)
+	GetRegistry() *prometheus.Registry
 }
 
-type metricPersister interface {
+type MetricPersister interface {
 	Init() error
-	PersistMetrics([]prompb.TimeSeries, logger) error
+	PersistMetrics([]prompb.TimeSeries, Logger) error
 }
 
 type Config interface {
 	Init() error
-	GetYaceOptions(logger logger) []yace.OptionsFunc
-}
-
-type Controller struct {
-	Logger    logger
-	Config    Config
-	Gatherer  metricGatherer
-	Persister metricPersister
-}
-
-func (c *Controller) Init() error {
-	if err := c.Logger.Init(); err != nil {
-		return err
-	}
-	if err := c.Config.Init(); err != nil {
-		return err
-	}
-	if err := c.Gatherer.Init(); err != nil {
-		return err
-	}
-	if err := c.Persister.Init(); err != nil {
-		return err
-	}
-	return nil
+	GetYaceOptions(logger Logger) []yace.OptionsFunc
 }

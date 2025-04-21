@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
 	"strconv"
@@ -14,7 +13,7 @@ const (
 )
 
 type YaceConfig struct {
-	PrometheusRemoteWriteURL                          string
+	//PrometheusRemoteWriteURL                          string
 	YaceCloudwatchConcurrencyPerApiLimitEnabled       string
 	YaceCloudwatchConcurrencyListMetricsLimit         string
 	YaceCloudwatchConcurrencyGetMetricDataLimit       string
@@ -26,7 +25,7 @@ type YaceConfig struct {
 
 func (c *YaceConfig) Init() error {
 	// Load environment variables
-	c.PrometheusRemoteWriteURL = os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")
+	//c.PrometheusRemoteWriteURL = os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")
 	c.YaceCloudwatchConcurrencyPerApiLimitEnabled = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED")
 	c.YaceCloudwatchConcurrencyListMetricsLimit = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT")
 	c.YaceCloudwatchConcurrencyGetMetricDataLimit = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT")
@@ -34,13 +33,13 @@ func (c *YaceConfig) Init() error {
 	c.YaceMetricsPerQuery = os.Getenv("YACE_METRICS_PER_QUERY")
 	c.YaceTaggingAPIConcurrency = os.Getenv("YACE_TAG_CONCURRENCY")
 	c.YaceCloudwatchConcurrency = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY")
-	if c.PrometheusRemoteWriteURL == "" {
-		return fmt.Errorf("PROMETHEUS_REMOTE_WRITE_URL is not set")
-	}
+	// if c.PrometheusRemoteWriteURL == "" {
+	// 	return fmt.Errorf("PROMETHEUS_REMOTE_WRITE_URL is not set")
+	// }
 	return nil
 }
 
-func (c *YaceConfig) GetYaceOptions(logger logger) []yace.OptionsFunc {
+func (c *YaceConfig) GetYaceOptions(logger Logger) []yace.OptionsFunc {
 	optFuncs := []yace.OptionsFunc{}
 	var cloudwatchPerApiConcurrencyLimit bool
 	var err error

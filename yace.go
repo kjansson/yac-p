@@ -25,7 +25,7 @@ type YaceClient struct {
 	Logger   *slog.Logger
 }
 
-func (y *YaceClient) CollectMetrics(logger logger, config Config) error {
+func (y *YaceClient) CollectMetrics(logger Logger, config Config) error {
 	var err error
 	ctx := context.Background()
 	// Query metrics and resources and update the prometheus registry
@@ -36,7 +36,7 @@ func (y *YaceClient) CollectMetrics(logger logger, config Config) error {
 	return nil
 }
 
-func (y *YaceClient) ExtractMetrics(logger logger) ([]*io_prometheus_client.MetricFamily, error) {
+func (y *YaceClient) ExtractMetrics(logger Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	var err error
 
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
@@ -44,6 +44,10 @@ func (y *YaceClient) ExtractMetrics(logger logger) ([]*io_prometheus_client.Metr
 		panic(err)
 	}
 	return metrics, nil
+}
+
+func (y *YaceClient) GetRegistry() *prometheus.Registry {
+	return y.Registry
 }
 
 func (y *YaceClient) Init() error {

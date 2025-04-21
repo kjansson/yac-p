@@ -45,7 +45,7 @@ func (p *PromClient) Init() error {
 	return nil
 }
 
-func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger logger) error {
+func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger Logger) error {
 
 	logger.Log("debug", "Sending timeseries", slog.Int("timeseries_count", len(timeSeries)))
 	logger.Log("debug", "Auth type", slog.String("auth_type", p.AuthType))
@@ -108,10 +108,11 @@ func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger logge
 
 	logger.Log("debug", "Sending request", slog.String("url", p.RemoteWriteURL), slog.Int("body_size", len(encoded)))
 	response, err := http.DefaultClient.Do(req)
-	logger.Log("debug", "Response", slog.String("status", response.Status), slog.Int("status_code", response.StatusCode))
 	if err != nil && response.StatusCode != http.StatusOK {
 		return err
 	}
+	logger.Log("debug", "Response", slog.String("status", response.Status), slog.Int("status_code", response.StatusCode))
+
 	return nil
 }
 
@@ -127,7 +128,7 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 	}
 }
 
-func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger logger) ([]prompb.TimeSeries, error) {
+func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger Logger) ([]prompb.TimeSeries, error) {
 
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series

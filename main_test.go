@@ -1,24 +1,23 @@
 package main
 
 import (
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
-	io_prometheus_client "github.com/prometheus/client_model/go"
 )
 
-// TestHelloName calls greetings.Hello with a name, checking
-// for a valid return value.
+func TestMetricsProcessing(t *testing.T) {
+	c := &Controller{
+		Logger:   &SlogLogger{},
+		Gatherer: &YaceClient{},
+	}
 
-type YaceMockClient struct {
-	registry *prometheus.Registry
-	//logger   *slog.Logger
-}
-
-func (y *YaceMockClient) Init() error {
-
-	//y.logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
-	y.registry = prometheus.NewRegistry() // Create a new prometheus registry
+	c.Gatherer.Init()
+	c.Logger.Init()
 
 	testGauge := prometheus.NewGauge(
 		prometheus.GaugeOpts{
@@ -27,33 +26,9 @@ func (y *YaceMockClient) Init() error {
 		},
 	)
 	testGauge.Set(1.0)
-	y.registry.Register(testGauge)
+	c.Gatherer.GetRegistry().MustRegister(testGauge)
 
-	return nil
-}
-
-func (y *YaceMockClient) CollectMetrics(logger logger, config Config) error {
-	return nil
-}
-
-func (y *YaceMockClient) ExtractMetrics(logger logger) ([]*io_prometheus_client.MetricFamily, error) {
-	metrics, err := y.registry.Gather() // Gather the metrics from the prometheus registry
-	if err != nil {
-		panic(err)
-	}
-	return metrics, nil
-}
-
-func TestMetricsProcessing(t *testing.T) {
-	c := &Controller{
-		Logger:   &SlogLogger{},
-		Gatherer: &YaceMockClient{},
-	}
-
-	c.Gatherer.Init()
-	c.Logger.Init()
-
-	metrics, err := c.Gatherer.ExtractMetrics(c.Logger)
+	metrics, err := c.ExtractMetrics()
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -86,4 +61,214 @@ func TestMetricsProcessing(t *testing.T) {
 			t.Fatalf("Timeseries does not have correct timestamp")
 		}
 	}
+}
+
+func TestMetricsPersistingNoAuth(t *testing.T) {
+
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+
+		if r.Header.Get("Content-Encoding") != "snappy" {
+			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
+		}
+		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
+			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
+		}
+		if r.Header.Get("Content-Type") != "application/x-protobuf" {
+			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		}
+		if r.Header.Get("Authorization") != "" {
+			t.Fatalf("Expected no Authorization header, got %s", r.Header.Get("Authorization"))
+		}
+	}))
+
+	logger := &SlogLogger{
+		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})),
+	}
+
+	promClient := &PromClient{
+		RemoteWriteURL: svr.URL,
+	}
+
+	c := &Controller{
+		Logger:    logger,
+		Gatherer:  &YaceClient{},
+		Config:    &YaceConfig{},
+		Persister: promClient,
+	}
+
+	c.Gatherer.Init()
+
+	testGauge := prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "test_gauge",
+			Help: "This is a test gauge",
+		},
+	)
+	testGauge.Set(1.0)
+	c.Gatherer.GetRegistry().MustRegister(testGauge)
+
+	metrics, err := c.ExtractMetrics()
+	if err != nil {
+		t.Fatalf("Failed to extract metrics: %v", err)
+	}
+
+	timeseries, err := processMetrics(metrics, c.Logger)
+	if err != nil {
+		t.Fatalf("Failed to process metrics: %v", err)
+	}
+
+	err = c.PersistMetrics(timeseries)
+	if err != nil {
+		t.Fatalf("Failed to persist metrics: %v", err)
+	}
+
+	defer svr.Close()
+
+}
+
+func TestMetricsPersistingBasicAuth(t *testing.T) {
+
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+
+		if r.Header.Get("Content-Encoding") != "snappy" {
+			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
+		}
+		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
+			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
+		}
+		if r.Header.Get("Content-Type") != "application/x-protobuf" {
+			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		}
+		username, password, _ := r.BasicAuth()
+		if username != "testuser" {
+			t.Fatalf("Expected username testuser, got %s", username)
+		}
+		if password != "testpassword" {
+			t.Fatalf("Expected password testpassword, got %s", password)
+		}
+	}))
+
+	logger := &SlogLogger{
+		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})),
+	}
+
+	promClient := &PromClient{
+		RemoteWriteURL: svr.URL,
+		AuthType:       "BASIC",
+		Username:       "testuser",
+		Password:       "testpassword",
+	}
+
+	c := &Controller{
+		Logger:    logger,
+		Gatherer:  &YaceClient{},
+		Config:    &YaceConfig{},
+		Persister: promClient,
+	}
+
+	c.Gatherer.Init()
+
+	testGauge := prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "test_gauge",
+			Help: "This is a test gauge",
+		},
+	)
+	testGauge.Set(1.0)
+	c.Gatherer.GetRegistry().MustRegister(testGauge)
+
+	metrics, err := c.ExtractMetrics()
+	if err != nil {
+		t.Fatalf("Failed to extract metrics: %v", err)
+	}
+
+	timeseries, err := processMetrics(metrics, c.Logger)
+	if err != nil {
+		t.Fatalf("Failed to process metrics: %v", err)
+	}
+
+	err = c.PersistMetrics(timeseries)
+	if err != nil {
+		t.Fatalf("Failed to persist metrics: %v", err)
+	}
+
+	defer svr.Close()
+
+}
+
+func TestMetricsPersistingTokenAuth(t *testing.T) {
+
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+
+		if r.Header.Get("Content-Encoding") != "snappy" {
+			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
+		}
+		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
+			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
+		}
+		if r.Header.Get("Content-Type") != "application/x-protobuf" {
+			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		}
+		if r.Header.Get("Authorization") != "Bearer testtoken" {
+			t.Fatalf("Expected Authorization Bearer testtoken, got %s", r.Header.Get("Authorization"))
+		}
+	}))
+
+	logger := &SlogLogger{
+		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})),
+	}
+
+	promClient := &PromClient{
+		RemoteWriteURL: svr.URL,
+		AuthType:       "TOKEN",
+		AuthToken:      "testtoken",
+	}
+
+	c := &Controller{
+		Logger:    logger,
+		Gatherer:  &YaceClient{},
+		Config:    &YaceConfig{},
+		Persister: promClient,
+	}
+
+	c.Gatherer.Init()
+
+	testGauge := prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "test_gauge",
+			Help: "This is a test gauge",
+		},
+	)
+	testGauge.Set(1.0)
+	c.Gatherer.GetRegistry().MustRegister(testGauge)
+
+	metrics, err := c.ExtractMetrics()
+	if err != nil {
+		t.Fatalf("Failed to extract metrics: %v", err)
+	}
+
+	timeseries, err := processMetrics(metrics, c.Logger)
+	if err != nil {
+		t.Fatalf("Failed to process metrics: %v", err)
+	}
+
+	err = c.PersistMetrics(timeseries)
+	if err != nil {
+		t.Fatalf("Failed to persist metrics: %v", err)
+	}
+
+	defer svr.Close()
+
 }
