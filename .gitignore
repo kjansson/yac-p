@@ -11,3 +11,4 @@ config.yaml
 
 bootstrap
 yac-p.zip
+.aws-sam
