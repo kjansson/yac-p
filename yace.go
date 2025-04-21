@@ -97,7 +97,6 @@ func (y *YaceClient) Init() error {
 		}
 	}
 
-	// Create a new yace client factory
 	y.Client, err = client.NewFactory(y.Logger, y.Config, false)
 	if err != nil {
 		return err
