@@ -16,8 +16,14 @@ func TestMetricsProcessing(t *testing.T) {
 		Gatherer: &YaceClient{},
 	}
 
-	c.Gatherer.Init()
-	c.Logger.Init()
+	err := c.Gatherer.Init()
+	if err != nil {
+		t.Fatalf("Failed to initialize gatherer: %v", err)
+	}
+	err = c.Logger.Init()
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	testGauge := prometheus.NewGauge(
 		prometheus.GaugeOpts{
@@ -100,7 +106,10 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	c.Gatherer.Init()
+	err := c.Gatherer.Init()
+	if err != nil {
+		t.Fatalf("Failed to initialize gatherer: %v", err)
+	}
 
 	testGauge := prometheus.NewGauge(
 		prometheus.GaugeOpts{
@@ -174,7 +183,10 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	c.Gatherer.Init()
+	err := c.Gatherer.Init()
+	if err != nil {
+		t.Fatalf("Failed to initialize gatherer: %v", err)
+	}
 
 	testGauge := prometheus.NewGauge(
 		prometheus.GaugeOpts{

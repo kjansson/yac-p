@@ -17,10 +17,13 @@ func HandleRequest() {
 		Persister: &PromClient{},
 	}
 
-	c.Init() // Initialize all components
+	err := c.Init() // Initialize all components
+	if err != nil {
+		panic(err)
+	}
 
 	// Gather cloudwatch metrics
-	err := c.CollectMetrics()
+	err = c.CollectMetrics()
 	if err != nil {
 		panic(err)
 	}
