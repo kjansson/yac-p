@@ -13,7 +13,7 @@ import (
 func TestMetricsProcessing(t *testing.T) {
 	c := &Controller{
 		Logger:   &SlogLogger{},
-		Gatherer: &YaceClient{},
+		Gatherer: &YaceMockClient{},
 	}
 
 	err := c.Gatherer.Init()
@@ -101,7 +101,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	c := &Controller{
 		Logger:    logger,
-		Gatherer:  &YaceClient{},
+		Gatherer:  &YaceMockClient{},
 		Config:    &YaceConfig{},
 		Persister: promClient,
 	}
@@ -178,7 +178,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 
 	c := &Controller{
 		Logger:    logger,
-		Gatherer:  &YaceClient{},
+		Gatherer:  &YaceMockClient{},
 		Config:    &YaceConfig{},
 		Persister: promClient,
 	}
@@ -250,7 +250,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 
 	c := &Controller{
 		Logger:    logger,
-		Gatherer:  &YaceClient{},
+		Gatherer:  &YaceMockClient{},
 		Config:    &YaceConfig{},
 		Persister: promClient,
 	}
@@ -282,5 +282,4 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 	}
 
 	defer svr.Close()
-
 }
