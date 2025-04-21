@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.0](https://github.com/kjansson/yac-p/compare/v0.7.1...v0.8.0) (2025-04-21)
+
+
+### Features
+
+* remove hard dependencies and add tests ([#26](https://github.com/kjansson/yac-p/issues/26)) ([4c4e41d](https://github.com/kjansson/yac-p/commit/4c4e41d12742a0b75b2f9c35a57612d08aaa0614))
+
+
+### Bug Fixes
+
+* remove the need for remote write role in assumable roles ([#19](https://github.com/kjansson/yac-p/issues/19)) ([17b9c19](https://github.com/kjansson/yac-p/commit/17b9c197b27edf3fd60a479d5c520b2df0da1f01))
+* rename types file for tests ([#27](https://github.com/kjansson/yac-p/issues/27)) ([7e97fc9](https://github.com/kjansson/yac-p/commit/7e97fc9192159c82f343258ef719c0eba16be622))
+
 ## [0.7.1](https://github.com/kjansson/yac-p/compare/v0.7.0...v0.7.1) (2025-03-31)
 
 
