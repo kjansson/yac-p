@@ -255,7 +255,10 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	c.Gatherer.Init()
+	err := c.Gatherer.Init()
+	if err != nil {
+		t.Fatalf("Failed to initialize gatherer: %v", err)
+	}
 
 	testGauge := prometheus.NewGauge(
 		prometheus.GaugeOpts{
