@@ -19,22 +19,27 @@ import (
 )
 
 type YaceClient struct {
-	registry *prometheus.Registry
-	client   *client.CachingFactory
-	config   model.JobsConfig
-	logger   *slog.Logger
+	Registry *prometheus.Registry
+	Client   *client.CachingFactory
+	Config   model.JobsConfig
+	Logger   *slog.Logger
 }
 
-func (y *YaceClient) GetMetrics(logger logger, config Config) ([]*io_prometheus_client.MetricFamily, error) {
+func (y *YaceClient) CollectMetrics(logger logger, config Config) error {
 	var err error
 	ctx := context.Background()
 	// Query metrics and resources and update the prometheus registry
-	err = yace.UpdateMetrics(ctx, y.logger, y.config, y.registry, y.client, config.GetYaceOptions(logger)...)
+	err = yace.UpdateMetrics(ctx, y.Logger, y.Config, y.Registry, y.Client, config.GetYaceOptions(logger)...)
 	if err != nil {
 		panic(err)
 	}
+	return nil
+}
 
-	metrics, err := y.registry.Gather() // Gather the metrics from the prometheus registry
+func (y *YaceClient) ExtractMetrics(logger logger) ([]*io_prometheus_client.MetricFamily, error) {
+	var err error
+
+	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		panic(err)
 	}
@@ -44,9 +49,9 @@ func (y *YaceClient) GetMetrics(logger logger, config Config) ([]*io_prometheus_
 func (y *YaceClient) Init() error {
 	var err error
 
-	y.logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
+	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	y.registry = prometheus.NewRegistry() // Create a new prometheus registry
+	y.Registry = prometheus.NewRegistry() // Create a new prometheus registry
 
 	configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
 	if configS3Bucket != "" && configS3Path != "" {
@@ -54,7 +59,7 @@ func (y *YaceClient) Init() error {
 		if err != nil {
 			return err
 		}
-		y.logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
+		y.Logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
 		s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
 		obj, err := s3svc.GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(configS3Bucket),
@@ -76,20 +81,20 @@ func (y *YaceClient) Init() error {
 		return fmt.Errorf("CONFIG_S3_BUCKET and CONFIG_S3_PATH is required")
 	}
 	config := config.ScrapeConf{}
-	y.config, err = config.Load(configFilePath, y.logger)
+	y.Config, err = config.Load(configFilePath, y.Logger)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, metric := range yace.Metrics { // Register YACE internal metrics
-		err := y.registry.Register(metric)
+		err := y.Registry.Register(metric)
 		if err != nil {
 			return err
 		}
 	}
 
 	// Create a new yace client factory
-	y.client, err = client.NewFactory(y.logger, y.config, false)
+	y.Client, err = client.NewFactory(y.Logger, y.Config, false)
 	if err != nil {
 		return err
 	}

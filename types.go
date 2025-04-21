@@ -13,7 +13,8 @@ type logger interface {
 
 type metricGatherer interface {
 	Init() error
-	GetMetrics(logger, Config) ([]*io_prometheus_client.MetricFamily, error)
+	CollectMetrics(logger, Config) error
+	ExtractMetrics(logger) ([]*io_prometheus_client.MetricFamily, error)
 }
 
 type metricPersister interface {

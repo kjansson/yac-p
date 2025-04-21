@@ -127,7 +127,7 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 	}
 }
 
-func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger logger) []prompb.TimeSeries {
+func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger logger) ([]prompb.TimeSeries, error) {
 
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series
@@ -148,7 +148,7 @@ func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger logger)
 
 			value, err := getValue(metricType, metric) // Extract the value of the metric based on the metric type
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 
 			timestamp := metric.GetTimestampMs() // Extract the timestamp of the metric
@@ -173,5 +173,5 @@ func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger logger)
 			timeSeries = append(timeSeries, ts)
 		}
 	}
-	return timeSeries
+	return timeSeries, nil
 }

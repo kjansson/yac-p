@@ -20,13 +20,19 @@ func HandleRequest() {
 	c.Init() // Initialize all components
 
 	// Gather cloudwatch metrics
-	metrics, err := c.Gatherer.GetMetrics(c.Logger, c.Config)
+	c.Gatherer.CollectMetrics(c.Logger, c.Config)
+
+	// Extract the metrics from the prometheus registry
+	metrics, err := c.Gatherer.ExtractMetrics(c.Logger)
 	if err != nil {
 		panic(err)
 	}
 
 	// Process the metrics into timeseries format
-	timeSeries := processMetrics(metrics, c.Logger)
+	timeSeries, err := processMetrics(metrics, c.Logger)
+	if err != nil {
+		panic(err)
+	}
 
 	// Persist the metrics to the remote write endpoint
 	err = c.Persister.PersistMetrics(timeSeries, c.Logger) // Send the timeseries to the remote write endpoint
