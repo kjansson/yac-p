@@ -1,12 +1,12 @@
 resource "null_resource" "build" {
   triggers = {
-    ##lambda_code = null_resource.go_files
-    source_hash = local.aggregated_hash
+    always = timestamp()
   }
   provisioner "local-exec" {
     command = "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ../bootstrap ../cmd/lambda"
   }
 }
+
 data "archive_file" "this" {
   type        = "zip"
   source_file = "../bootstrap"
