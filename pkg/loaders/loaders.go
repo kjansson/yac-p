@@ -1,5 +1,7 @@
 package loaders
 
+// Package loaders provides functions to load configuration files from different sources
+
 import (
 	"fmt"
 	"io"
@@ -10,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+// GetS3Loader returns a function that loads the config from S3
 func GetS3Loader() func() ([]byte, error) {
 	return func() ([]byte, error) {
 		var content []byte
@@ -41,6 +44,7 @@ func GetS3Loader() func() ([]byte, error) {
 	}
 }
 
+// GetLocalFileLoader returns a function that loads the config from a local file
 func GetLocalFileLoader() func() (content []byte, err error) {
 	return func() (content []byte, err error) {
 		configFilePath := os.Getenv("CONFIG_FILE_PATH")

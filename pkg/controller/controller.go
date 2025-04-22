@@ -1,5 +1,7 @@
 package controller
 
+// Package controller provides the Controller struct and its methods to manage the components of the application
+
 import (
 	"github.com/kjansson/yac-p/pkg/types"
 	io_prometheus_client "github.com/prometheus/client_model/go"

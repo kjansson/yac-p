@@ -1,5 +1,7 @@
 package yace
 
+// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages
+
 import (
 	"context"
 	"log/slog"

@@ -1,5 +1,7 @@
 package logger
 
+// Package logger provides a simple logging interface yac-p
+
 import (
 	"log/slog"
 	"os"
