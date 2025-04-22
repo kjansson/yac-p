@@ -49,7 +49,7 @@ func (y *YaceMockClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
-func (y *YaceMockClient) Init() error {
+func (y *YaceMockClient) Init(func() ([]byte, error)) error {
 
 	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 

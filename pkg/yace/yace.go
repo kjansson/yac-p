@@ -2,15 +2,10 @@ package yace
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"strconv"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/kjansson/yac-p/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
@@ -61,41 +56,52 @@ func (y *YaceClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
-// Init initializes the YACE client and loads the configuration from S3
-func (y *YaceClient) Init() error {
+// Init initializes the YACE client and loads the configuration
+func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 	var err error
 
 	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	y.Registry = prometheus.NewRegistry() // Create a new prometheus registry
 
-	configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
-	if configS3Bucket != "" && configS3Path != "" {
-		sess, err := createAWSSession()
-		if err != nil {
-			return err
-		}
-		y.Logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
-		s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
-		obj, err := s3svc.GetObject(&s3.GetObjectInput{
-			Bucket: aws.String(configS3Bucket),
-			Key:    aws.String(configS3Path),
-		})
-		if err != nil {
-			return err
-		}
-		content, err := io.ReadAll(obj.Body)
-		if err != nil {
-			return err
-		}
-		// Write the configuration to a ephemeral storage, this is needed since the config package expects a file path
-		err = os.WriteFile(configFilePath, content, 0644)
-		if err != nil {
-			return err
-		}
-	} else {
-		return fmt.Errorf("CONFIG_S3_BUCKET and CONFIG_S3_PATH is required")
+	// configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
+	// if configS3Bucket != "" && configS3Path != "" {
+	// 	sess, err := createAWSSession()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	y.Logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
+	// 	s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+	// 	obj, err := s3svc.GetObject(&s3.GetObjectInput{
+	// 		Bucket: aws.String(configS3Bucket),
+	// 		Key:    aws.String(configS3Path),
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	content, err := io.ReadAll(obj.Body)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	// Write the configuration to a ephemeral storage, this is needed since the config package expects a file path
+	// 	err = os.WriteFile(configFilePath, content, 0644)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// } else {
+	// 	return fmt.Errorf("CONFIG_S3_BUCKET and CONFIG_S3_PATH is required")
+	// }
+
+	contents, err := getConfig()
+	if err != nil {
+		return err
 	}
+
+	err = os.WriteFile(configFilePath, contents, 0644)
+	if err != nil {
+		return err
+	}
+
 	config := config.ScrapeConf{}
 	y.Config, err = config.Load(configFilePath, y.Logger)
 	if err != nil {
@@ -114,17 +120,6 @@ func (y *YaceClient) Init() error {
 		return err
 	}
 	return nil
-}
-
-func createAWSSession() (*session.Session, error) {
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
-		SharedConfigState: session.SharedConfigEnable,
-	})
-	if err != nil {
-		return sess, err
-	}
-	return sess, err
 }
 
 type YaceOptions struct {

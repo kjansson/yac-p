@@ -14,14 +14,14 @@ type Controller struct {
 }
 
 // Init initializes all components of the controller
-func (c *Controller) Init() error {
+func (c *Controller) Init(configFileLoader func() ([]byte, error)) error {
 	if err := c.Logger.Init(); err != nil {
 		return err
 	}
 	if err := c.Config.Init(); err != nil {
 		return err
 	}
-	if err := c.Gatherer.Init(); err != nil {
+	if err := c.Gatherer.Init(configFileLoader); err != nil {
 		return err
 	}
 	if err := c.Persister.Init(); err != nil {

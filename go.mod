@@ -12,6 +12,8 @@ replace github.com/kjansson/yac-p/pkg/logger => /Users/kjansson/dev/swb-observab
 
 replace github.com/kjansson/yac-p/pkg/tests => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/tests
 
+replace github.com/kjansson/yac-p/pkg/loaders => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/loaders
+
 go 1.23.0
 
 toolchain go1.23.8

@@ -35,7 +35,7 @@ func TestMetricsProcessing(t *testing.T) {
 		Gatherer: &tests.YaceMockClient{},
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -120,7 +120,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -192,7 +192,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -259,7 +259,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}

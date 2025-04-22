@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/kjansson/yac-p/pkg/controller"
+	"github.com/kjansson/yac-p/pkg/loaders"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/yace"
@@ -22,7 +23,7 @@ func HandleRequest() {
 		Persister: &prom.PromClient{},
 	}
 
-	err := c.Init() // Initialize all components
+	err := c.Init(loaders.GetS3Loader()) // Initialize all components
 	if err != nil {
 		panic(err)
 	}
