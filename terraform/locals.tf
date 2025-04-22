@@ -7,7 +7,7 @@ locals {
   prom_files = fileset("${path.module}", "pkg/prom/*.go")
   types_files = fileset("${path.module}", "pkg/types/*.go")
   yace_files = fileset("${path.module}", "pkg/yace/*.go")
-  main_files = fileset("${path.module}", "main.go")
+  main_files = fileset("${path.module}", "cmd/yac-p-lambda/*.go")
 
   all_files = concat(
     tolist(local.controller_files),

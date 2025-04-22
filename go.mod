@@ -1,19 +1,5 @@
 module github.com/kjansson/yac-p
 
-replace github.com/kjansson/yac-p/pkg/config => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/config
-
-replace github.com/kjansson/yac-p/pkg/types => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/types
-
-replace github.com/kjansson/yac-p/pkg/prom => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/prom
-
-replace github.com/kjansson/yac-p/pkg/yace => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/yace
-
-replace github.com/kjansson/yac-p/pkg/logger => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/logger
-
-replace github.com/kjansson/yac-p/pkg/tests => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/tests
-
-replace github.com/kjansson/yac-p/pkg/loaders => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/loaders
-
 go 1.23.0
 
 toolchain go1.23.8
@@ -26,6 +12,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/prometheus v0.303.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -66,5 +53,4 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
