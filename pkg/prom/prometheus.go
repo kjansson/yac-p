@@ -33,19 +33,19 @@ type PromClient struct {
 }
 
 // Init initializes the PromClient with the remote write URL and authentication details
-func (p *PromClient) Init() error {
-	p.RemoteWriteURL = os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")
-	p.AuthType = os.Getenv("AUTH_TYPE")
-	p.AuthToken = os.Getenv("TOKEN")
-	p.Username = os.Getenv("USERNAME")
-	p.Password = os.Getenv("PASSWORD")
-	p.Region = os.Getenv("AWS_REGION")
-	p.PrometheusRegion = os.Getenv("PROMETHEUS_REGION")
-	p.AWSRoleARN = os.Getenv("AWS_ROLE_ARN")
-
-	if p.RemoteWriteURL == "" {
-		return fmt.Errorf("PROMETHEUS_REMOTE_WRITE_URL is not set")
+func (p *PromClient) Init(config types.Config) error {
+	if config.RemoteWriteURL == "" {
+		return fmt.Errorf("prometheus remote write URL must be set")
 	}
+	p.RemoteWriteURL = config.RemoteWriteURL
+	p.AuthType = config.AuthType
+	p.AuthToken = config.AuthToken
+	p.Username = config.Username
+	p.Password = config.Password
+	p.Region = config.Region
+	p.PrometheusRegion = config.PrometheusRegion
+	p.AWSRoleARN = config.AWSRoleARN
+
 	return nil
 }
 

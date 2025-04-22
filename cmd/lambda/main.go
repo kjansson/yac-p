@@ -1,12 +1,15 @@
 package main
 
 import (
+	"os"
+
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/loaders"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
+	"github.com/kjansson/yac-p/pkg/types"
 	"github.com/kjansson/yac-p/pkg/yace"
 )
 
@@ -16,14 +19,34 @@ func main() {
 
 func HandleRequest() {
 
-	c := &controller.Controller{
-		Logger:    &logger.SlogLogger{},
-		Config:    &yace.YaceOptions{},
-		Collector: &yace.YaceClient{},
-		Persister: &prom.PromClient{},
+	config := &types.Config{
+		ConfigFileLoader: loaders.GetS3Loader(), // Use the S3 loader for Lambda implementation
+		RemoteWriteURL:   os.Getenv("PROMETHEUS_REMOTE_WRITE_URL"),
+		AuthType:         os.Getenv("AUTH_TYPE"),
+		AuthToken:        os.Getenv("TOKEN"),
+		Username:         os.Getenv("USERNAME"),
+		Password:         os.Getenv("PASSWORD"),
+		Region:           os.Getenv("AWS_REGION"),
+		PrometheusRegion: os.Getenv("PROMETHEUS_REGION"),
+		AWSRoleARN:       os.Getenv("AWS_ROLE_ARN"),
+		YaceCloudwatchConcurrencyPerApiLimitEnabled:       os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED"),
+		YaceCloudwatchConcurrencyListMetricsLimit:         os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT"),
+		YaceCloudwatchConcurrencyGetMetricDataLimit:       os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT"),
+		YaceCloudwatchConcurrencyGetMetricStatisticsLimit: os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT"),
+		YaceMetricsPerQuery:                               os.Getenv("YACE_METRICS_PER_QUERY"),
+		YaceTaggingAPIConcurrency:                         os.Getenv("YACE_TAGGING_API_CONCURRENCY"),
+		YaceCloudwatchConcurrency:                         os.Getenv("YACE_CLOUDWATCH_CONCURRENCY"),
 	}
 
-	err := c.Init(loaders.GetS3Loader()) // Initialize all components, use the S3 loader for Lambda implementation
+	c := &controller.Controller{
+		Logger:     &logger.SlogLogger{},
+		YaceConfig: &yace.YaceOptions{},
+		Collector:  &yace.YaceClient{},
+		Persister:  &prom.PromClient{},
+		Config:     *config,
+	}
+
+	err := c.Init() // Initialize all components, use the S3 loader for Lambda implementation
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages for collecting metrics from AWS Cloudwatch.
+// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages for collecting metrics from AWS Cloudwatch as well as managing
 // It implements the types.MetricCollector interface.
 package yace
 
@@ -11,7 +11,7 @@ import (
 	"github.com/kjansson/yac-p/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
-	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/config"
+	yace_config "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/config"
 	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/model"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
@@ -26,7 +26,7 @@ type YaceClient struct {
 }
 
 // CollectMetrics performs the Cloudwatch metrics collection and updates the prometheus registry
-func (y *YaceClient) CollectMetrics(logger types.Logger, config types.Config) error {
+func (y *YaceClient) CollectMetrics(logger types.Logger, config types.YaceConfig) error {
 	ctx := context.Background()
 
 	opts, err := config.GetYaceOptions(logger) // Get the YACE options from the config
@@ -57,19 +57,19 @@ func (y *YaceClient) GetRegistry() *prometheus.Registry {
 
 // Init initializes the YACE client
 // It expects a function for loading the yace configuration file
-func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
+func (y *YaceClient) Init(config types.Config) error {
 	var err error
 
 	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	y.Registry = prometheus.NewRegistry() // Create a new prometheus registry
 
-	contents, err := getConfig()
+	contents, err := config.ConfigFileLoader()
 	if err != nil {
 		return err
 	}
 
-	conf := config.ScrapeConf{}
+	conf := yace_config.ScrapeConf{}
 	err = yaml.Unmarshal(contents, &conf)
 	if err != nil {
 		return err
@@ -77,19 +77,19 @@ func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 
 	for _, job := range conf.Discovery.Jobs {
 		if len(job.Roles) == 0 {
-			job.Roles = []config.Role{{}} // use current IAM role
+			job.Roles = []yace_config.Role{{}} // use current IAM role
 		}
 	}
 
 	for _, job := range conf.CustomNamespace {
 		if len(job.Roles) == 0 {
-			job.Roles = []config.Role{{}} // use current IAM role
+			job.Roles = []yace_config.Role{{}} // use current IAM role
 		}
 	}
 
 	for _, job := range conf.Static {
 		if len(job.Roles) == 0 {
-			job.Roles = []config.Role{{}} // use current IAM role
+			job.Roles = []yace_config.Role{{}} // use current IAM role
 		}
 	}
 
@@ -123,14 +123,14 @@ type YaceOptions struct {
 	YaceCloudwatchConcurrency                         string
 }
 
-func (c *YaceOptions) Init() error {
-	c.YaceCloudwatchConcurrencyPerApiLimitEnabled = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED")
-	c.YaceCloudwatchConcurrencyListMetricsLimit = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT")
-	c.YaceCloudwatchConcurrencyGetMetricDataLimit = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT")
-	c.YaceCloudwatchConcurrencyGetMetricStatisticsLimit = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT")
-	c.YaceMetricsPerQuery = os.Getenv("YACE_METRICS_PER_QUERY")
-	c.YaceTaggingAPIConcurrency = os.Getenv("YACE_TAG_CONCURRENCY")
-	c.YaceCloudwatchConcurrency = os.Getenv("YACE_CLOUDWATCH_CONCURRENCY")
+func (c *YaceOptions) Init(config types.Config) error {
+	c.YaceCloudwatchConcurrencyPerApiLimitEnabled = config.YaceCloudwatchConcurrencyPerApiLimitEnabled
+	c.YaceCloudwatchConcurrencyListMetricsLimit = config.YaceCloudwatchConcurrencyListMetricsLimit
+	c.YaceCloudwatchConcurrencyGetMetricDataLimit = config.YaceCloudwatchConcurrencyGetMetricDataLimit
+	c.YaceCloudwatchConcurrencyGetMetricStatisticsLimit = config.YaceCloudwatchConcurrencyGetMetricStatisticsLimit
+	c.YaceMetricsPerQuery = config.YaceMetricsPerQuery
+	c.YaceTaggingAPIConcurrency = config.YaceTaggingAPIConcurrency
+	c.YaceCloudwatchConcurrency = config.YaceCloudwatchConcurrency
 	return nil
 }
 

@@ -11,6 +11,7 @@ import (
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/tests"
+	"github.com/kjansson/yac-p/pkg/types"
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -34,11 +35,13 @@ func TestMetricsProcessing(t *testing.T) {
 		Collector: &tests.YaceMockClient{},
 	}
 
-	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(types.Config{})
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
-	err = c.Logger.Init()
+	err = c.Logger.Init(types.Config{
+		ConfigFileLoader: tests.GetTestConfigLoader(),
+	})
 	if err != nil {
 		t.Fatalf("Failed to initialize logger: %v", err)
 	}
@@ -113,13 +116,13 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 	}
 
 	c := &controller.Controller{
-		Logger:    logger,
-		Collector: &tests.YaceMockClient{},
-		Config:    &yace.YaceOptions{},
-		Persister: promClient,
+		Logger:     logger,
+		Collector:  &tests.YaceMockClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  promClient,
 	}
 
-	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(c.Config)
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
@@ -185,13 +188,15 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 	}
 
 	c := &controller.Controller{
-		Logger:    logger,
-		Collector: &tests.YaceMockClient{},
-		Config:    &yace.YaceOptions{},
-		Persister: promClient,
+		Logger:     logger,
+		Collector:  &tests.YaceMockClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  promClient,
 	}
 
-	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(types.Config{
+		RemoteWriteURL: svr.URL,
+	})
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
@@ -252,13 +257,15 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 	}
 
 	c := &controller.Controller{
-		Logger:    logger,
-		Collector: &tests.YaceMockClient{},
-		Config:    &yace.YaceOptions{},
-		Persister: promClient,
+		Logger:     logger,
+		Collector:  &tests.YaceMockClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  promClient,
 	}
 
-	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(types.Config{
+		RemoteWriteURL: svr.URL,
+	})
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}

@@ -5,7 +5,8 @@ package logger
 import (
 	"log/slog"
 	"os"
-	"strconv"
+
+	"github.com/kjansson/yac-p/pkg/types"
 )
 
 type SlogLogger struct {
@@ -13,16 +14,10 @@ type SlogLogger struct {
 }
 
 // Init initializes the logger and determines the log level
-func (l *SlogLogger) Init() error {
-
-	debugEnv := os.Getenv("DEBUG")
-	debug, err := strconv.ParseBool(debugEnv)
-	if err != nil {
-		debug = false
-	}
+func (l *SlogLogger) Init(config types.Config) error {
 
 	logOpts := &slog.HandlerOptions{}
-	if debug {
+	if config.Debug {
 		logOpts.Level = slog.LevelDebug
 	} else {
 		logOpts.Level = slog.LevelInfo

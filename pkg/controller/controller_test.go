@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/tests"
+	"github.com/kjansson/yac-p/pkg/types"
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -29,24 +29,17 @@ func checkHeaders(r *http.Request) error {
 
 func TestConfigLoad(t *testing.T) {
 	c := &Controller{
-		Logger:    &logger.SlogLogger{},
-		Collector: &tests.YaceMockClient{},
-		Config:    &yace.YaceOptions{},
-		Persister: &prom.PromClient{},
+		Logger:     &logger.SlogLogger{},
+		Collector:  &tests.YaceMockClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  &prom.PromClient{},
+		Config: types.Config{
+			RemoteWriteURL:   "http://localhost:1234",
+			ConfigFileLoader: tests.GetTestConfigLoader(),
+		},
 	}
 
-	err := os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", "http://localhost:9090/api/v1/write")
-	if err != nil {
-		t.Fatalf("Failed to set environment variable: %v", err)
-	}
-	defer func() {
-		err := os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
-		if err != nil {
-			t.Fatalf("Failed to unset environment variable: %v", err)
-		}
-	}()
-
-	err = c.Init(tests.GetTestConfigLoader()) // Initialize all components
+	err := c.Init() // Initialize all components
 	if err != nil {
 		t.Fatalf("Failed to initialize with vaild config: %v", err)
 	}
@@ -67,35 +60,18 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		}
 	}))
 
-	err := os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", svr.URL)
-	if err != nil {
-		t.Fatalf("Failed to set environment variable: %v", err)
-	}
-	defer func() {
-		err := os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
-		if err != nil {
-			t.Fatalf("Failed to unset environment variable: %v", err)
-		}
-	}()
-	err = os.Setenv("DEBUG", "true")
-	if err != nil {
-		t.Fatalf("Failed to set environment variable: %v", err)
-	}
-	defer func() {
-		err := os.Unsetenv("DEBUG")
-		if err != nil {
-			t.Fatalf("Failed to unset environment variable: %v", err)
-		}
-	}()
-
 	c := &Controller{
-		Logger:    &logger.SlogLogger{},
-		Collector: &tests.YaceMockClient{},
-		Config:    &yace.YaceOptions{},
-		Persister: &prom.PromClient{},
+		Logger:     &logger.SlogLogger{},
+		Collector:  &tests.YaceMockClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  &prom.PromClient{},
+		Config: types.Config{
+			RemoteWriteURL:   svr.URL,
+			ConfigFileLoader: tests.GetTestConfigLoader(),
+		},
 	}
 
-	err = c.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Init()
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}

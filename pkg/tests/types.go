@@ -21,7 +21,7 @@ type YaceMockClient struct {
 	Logger   *slog.Logger
 }
 
-func (y *YaceMockClient) CollectMetrics(logger types.Logger, config types.Config) error {
+func (y *YaceMockClient) CollectMetrics(logger types.Logger, config types.YaceConfig) error {
 	var err error
 	ctx := context.Background()
 	// Query metrics and resources and update the prometheus registry
@@ -50,7 +50,7 @@ func (y *YaceMockClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
-func (y *YaceMockClient) Init(func() ([]byte, error)) error {
+func (y *YaceMockClient) Init(types.Config) error {
 
 	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 
