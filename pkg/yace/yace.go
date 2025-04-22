@@ -112,6 +112,7 @@ func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 	return nil
 }
 
+// See YACE documentation for more details on the options
 type YaceOptions struct {
 	YaceCloudwatchConcurrencyPerApiLimitEnabled       string
 	YaceCloudwatchConcurrencyListMetricsLimit         string
@@ -133,6 +134,7 @@ func (c *YaceOptions) Init() error {
 	return nil
 }
 
+// GetYaceOptions returns the YACE options function based on the config
 func (c *YaceOptions) GetYaceOptions(logger types.Logger) ([]yace.OptionsFunc, error) {
 	optFuncs := []yace.OptionsFunc{}
 	var cloudwatchPerApiConcurrencyLimit bool
