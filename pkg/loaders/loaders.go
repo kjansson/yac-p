@@ -19,6 +19,9 @@ func GetS3Loader() func() ([]byte, error) {
 				Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
 				SharedConfigState: session.SharedConfigEnable,
 			})
+			if err != nil {
+				return nil, err
+			}
 			s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
 			obj, err := s3svc.GetObject(&s3.GetObjectInput{
 				Bucket: aws.String(configS3Bucket),
