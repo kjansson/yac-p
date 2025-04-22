@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/kjansson/yac-p/compare/v0.9.0...v1.0.0) (2025-04-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* changes field names in the controller struct
+
+### Features
+
+* code makeover ([#34](https://github.com/kjansson/yac-p/issues/34)) ([5653a84](https://github.com/kjansson/yac-p/commit/5653a847051a16b4bdb3a7e74470f743fe25471f))
+
 ## [0.9.0](https://github.com/kjansson/yac-p/compare/v0.8.1...v0.9.0) (2025-04-22)
 
 
