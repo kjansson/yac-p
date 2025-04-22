@@ -41,16 +41,19 @@ func GetS3Loader() func() ([]byte, error) {
 	}
 }
 
-func GetLocalFileLoader() func() ([]byte, error) {
-	return func() ([]byte, error) {
-		var content []byte
+func GetLocalFileLoader() func() (content []byte, err error) {
+	return func() (content []byte, err error) {
 		configFilePath := os.Getenv("CONFIG_FILE_PATH")
 		if configFilePath != "" {
 			file, err := os.Open(configFilePath)
 			if err != nil {
 				return nil, err
 			}
-			defer file.Close()
+
+			defer func() {
+				err = file.Close()
+			}()
+
 			content, err = io.ReadAll(file)
 			if err != nil {
 				return nil, err
