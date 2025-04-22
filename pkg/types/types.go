@@ -1,6 +1,5 @@
-package types
-
 // Package types defines interfaces and constants used in yac-p
+package types
 
 import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
