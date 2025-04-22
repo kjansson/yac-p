@@ -7,11 +7,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kjansson/yac-p/pkg/config"
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/tests"
+	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -107,7 +107,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 	c := &controller.Controller{
 		Logger:    logger,
 		Gatherer:  &tests.YaceMockClient{},
-		Config:    &config.YaceConfig{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
@@ -184,7 +184,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 	c := &controller.Controller{
 		Logger:    logger,
 		Gatherer:  &tests.YaceMockClient{},
-		Config:    &config.YaceConfig{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
@@ -256,7 +256,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 	c := &controller.Controller{
 		Logger:    logger,
 		Gatherer:  &tests.YaceMockClient{},
-		Config:    &config.YaceConfig{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 

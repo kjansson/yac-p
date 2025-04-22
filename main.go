@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/aws/aws-lambda-go/lambda"
 
-	"github.com/kjansson/yac-p/pkg/config"
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
@@ -18,7 +17,7 @@ func HandleRequest() {
 
 	c := &controller.Controller{
 		Logger:    &logger.SlogLogger{},
-		Config:    &config.YaceConfig{},
+		Config:    &yace.YaceOptions{},
 		Gatherer:  &yace.YaceClient{},
 		Persister: &prom.PromClient{},
 	}
