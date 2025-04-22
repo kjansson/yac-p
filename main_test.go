@@ -7,13 +7,18 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kjansson/yac-p/pkg/config"
+	"github.com/kjansson/yac-p/pkg/controller"
+	"github.com/kjansson/yac-p/pkg/logger"
+	"github.com/kjansson/yac-p/pkg/prom"
+	"github.com/kjansson/yac-p/pkg/tests"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 func TestMetricsProcessing(t *testing.T) {
-	c := &Controller{
-		Logger:   &SlogLogger{},
-		Gatherer: &YaceMockClient{},
+	c := &controller.Controller{
+		Logger:   &logger.SlogLogger{},
+		Gatherer: &tests.YaceMockClient{},
 	}
 
 	err := c.Gatherer.Init()
@@ -39,7 +44,7 @@ func TestMetricsProcessing(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -89,20 +94,20 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
 	}
 
-	promClient := &PromClient{
+	promClient := &prom.PromClient{
 		RemoteWriteURL: svr.URL,
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &config.YaceConfig{},
 		Persister: promClient,
 	}
 
@@ -125,7 +130,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -163,23 +168,23 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
 	}
 
-	promClient := &PromClient{
+	promClient := &prom.PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "BASIC",
 		Username:       "testuser",
 		Password:       "testpassword",
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &config.YaceConfig{},
 		Persister: promClient,
 	}
 
@@ -202,7 +207,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -236,22 +241,22 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
 	}
 
-	promClient := &PromClient{
+	promClient := &prom.PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "TOKEN",
 		AuthToken:      "testtoken",
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &config.YaceConfig{},
 		Persister: promClient,
 	}
 
@@ -274,7 +279,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}

@@ -1,5 +1,17 @@
 module github.com/kjansson/yac-p
 
+replace github.com/kjansson/yac-p/pkg/config => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/config
+
+replace github.com/kjansson/yac-p/pkg/types => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/types
+
+replace github.com/kjansson/yac-p/pkg/prom => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/prom
+
+replace github.com/kjansson/yac-p/pkg/yace => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/yace
+
+replace github.com/kjansson/yac-p/pkg/logger => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/logger
+
+replace github.com/kjansson/yac-p/pkg/tests => /Users/kjansson/dev/swb-observability-poc/yac-p/pkg/tests
+
 go 1.23.0
 
 toolchain go1.23.8

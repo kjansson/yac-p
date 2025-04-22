@@ -1,15 +1,12 @@
-package main
+package config
 
 import (
 	"log/slog"
 	"os"
 	"strconv"
 
+	"github.com/kjansson/yac-p/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
-)
-
-const (
-	configFilePath = "/tmp/config.yaml"
 )
 
 type YaceConfig struct {
@@ -33,7 +30,7 @@ func (c *YaceConfig) Init() error {
 	return nil
 }
 
-func (c *YaceConfig) GetYaceOptions(logger Logger) ([]yace.OptionsFunc, error) {
+func (c *YaceConfig) GetYaceOptions(logger types.Logger) ([]yace.OptionsFunc, error) {
 	optFuncs := []yace.OptionsFunc{}
 	var cloudwatchPerApiConcurrencyLimit bool
 	var err error

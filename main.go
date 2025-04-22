@@ -2,6 +2,12 @@ package main
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/kjansson/yac-p/pkg/config"
+	"github.com/kjansson/yac-p/pkg/controller"
+	"github.com/kjansson/yac-p/pkg/logger"
+	"github.com/kjansson/yac-p/pkg/prom"
+	"github.com/kjansson/yac-p/pkg/yace"
 )
 
 func main() {
@@ -10,11 +16,11 @@ func main() {
 
 func HandleRequest() {
 
-	c := &Controller{
-		Logger:    &SlogLogger{},
-		Config:    &YaceConfig{},
-		Gatherer:  &YaceClient{},
-		Persister: &PromClient{},
+	c := &controller.Controller{
+		Logger:    &logger.SlogLogger{},
+		Config:    &config.YaceConfig{},
+		Gatherer:  &yace.YaceClient{},
+		Persister: &prom.PromClient{},
 	}
 
 	err := c.Init() // Initialize all components
@@ -35,7 +41,7 @@ func HandleRequest() {
 	}
 
 	// Process the metrics into timeseries format
-	timeSeries, err := processMetrics(metrics, c.Logger)
+	timeSeries, err := prom.ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		panic(err)
 	}

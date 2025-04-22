@@ -1,15 +1,16 @@
-package main
+package controller
 
 import (
+	"github.com/kjansson/yac-p/pkg/types"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )
 
 type Controller struct {
-	Logger    Logger
-	Config    Config
-	Gatherer  MetricGatherer
-	Persister MetricPersister
+	Logger    types.Logger
+	Config    types.Config
+	Gatherer  types.MetricGatherer
+	Persister types.MetricPersister
 }
 
 func (c *Controller) Init() error {

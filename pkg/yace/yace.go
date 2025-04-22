@@ -1,4 +1,4 @@
-package main
+package yace
 
 import (
 	"context"
@@ -10,12 +10,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/kjansson/yac-p/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
 	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/config"
 	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/model"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
+)
+
+const (
+	configFilePath = "/tmp/config.yaml"
 )
 
 type YaceClient struct {
@@ -25,7 +30,7 @@ type YaceClient struct {
 	Logger   *slog.Logger
 }
 
-func (y *YaceClient) CollectMetrics(logger Logger, config Config) error {
+func (y *YaceClient) CollectMetrics(logger types.Logger, config types.Config) error {
 	ctx := context.Background()
 
 	opts, err := config.GetYaceOptions(logger) // Get the YACE options from the config
@@ -40,7 +45,7 @@ func (y *YaceClient) CollectMetrics(logger Logger, config Config) error {
 	return nil
 }
 
-func (y *YaceClient) ExtractMetrics(logger Logger) ([]*io_prometheus_client.MetricFamily, error) {
+func (y *YaceClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		return nil, err

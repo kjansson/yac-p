@@ -1,10 +1,14 @@
-package main
+package types
 
 import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
+)
+
+const (
+	prom_rw_version_header_name = "X-Prometheus-Remote-Write-Version"
 )
 
 type Logger interface {
