@@ -40,3 +40,24 @@ func GetS3Loader() func() ([]byte, error) {
 		return content, nil
 	}
 }
+
+func LocalFileLoader() func() ([]byte, error) {
+	return func() ([]byte, error) {
+		var content []byte
+		configFilePath := os.Getenv("CONFIG_FILE_PATH")
+		if configFilePath != "" {
+			file, err := os.Open(configFilePath)
+			if err != nil {
+				return nil, err
+			}
+			defer file.Close()
+			content, err = io.ReadAll(file)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, fmt.Errorf("CONFIG_FILE_PATH is required")
+		}
+		return content, nil
+	}
+}

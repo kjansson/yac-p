@@ -13,10 +13,7 @@ import (
 	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/model"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
-)
-
-const (
-	configFilePath = "/tmp/config.yaml"
+	"gopkg.in/yaml.v2"
 )
 
 type YaceClient struct {
@@ -64,48 +61,38 @@ func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 
 	y.Registry = prometheus.NewRegistry() // Create a new prometheus registry
 
-	// configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
-	// if configS3Bucket != "" && configS3Path != "" {
-	// 	sess, err := createAWSSession()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	y.Logger.Debug("Using S3 config", slog.String("bucket", configS3Bucket), slog.String("path", configS3Path))
-	// 	s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
-	// 	obj, err := s3svc.GetObject(&s3.GetObjectInput{
-	// 		Bucket: aws.String(configS3Bucket),
-	// 		Key:    aws.String(configS3Path),
-	// 	})
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	content, err := io.ReadAll(obj.Body)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	// Write the configuration to a ephemeral storage, this is needed since the config package expects a file path
-	// 	err = os.WriteFile(configFilePath, content, 0644)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// } else {
-	// 	return fmt.Errorf("CONFIG_S3_BUCKET and CONFIG_S3_PATH is required")
-	// }
-
 	contents, err := getConfig()
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(configFilePath, contents, 0644)
+	conf := config.ScrapeConf{}
+	err = yaml.Unmarshal(contents, conf)
 	if err != nil {
 		return err
 	}
 
-	config := config.ScrapeConf{}
-	y.Config, err = config.Load(configFilePath, y.Logger)
+	for _, job := range conf.Discovery.Jobs {
+		if len(job.Roles) == 0 {
+			job.Roles = []config.Role{{}} // use current IAM role
+		}
+	}
+
+	for _, job := range conf.CustomNamespace {
+		if len(job.Roles) == 0 {
+			job.Roles = []config.Role{{}} // use current IAM role
+		}
+	}
+
+	for _, job := range conf.Static {
+		if len(job.Roles) == 0 {
+			job.Roles = []config.Role{{}} // use current IAM role
+		}
+	}
+
+	y.Config, err = conf.Validate(y.Logger)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, metric := range yace.Metrics { // Register YACE internal metrics
