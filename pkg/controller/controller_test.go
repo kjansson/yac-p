@@ -35,10 +35,13 @@ func TestConfigLoad(t *testing.T) {
 		Persister: &prom.PromClient{},
 	}
 
-	os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", "http://localhost:9090/api/v1/write")
+	err := os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", "http://localhost:9090/api/v1/write")
+	if err != nil {
+		t.Fatalf("Failed to set environment variable: %v", err)
+	}
 	defer os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
 
-	err := c.Init(tests.GetTestConfigLoader()) // Initialize all components
+	err = c.Init(tests.GetTestConfigLoader()) // Initialize all components
 	if err != nil {
 		t.Fatalf("Failed to initialize with vaild config: %v", err)
 	}
@@ -59,10 +62,26 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		}
 	}))
 
-	os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", svr.URL)
-	defer os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
-	os.Setenv("DEBUG", "true")
-	defer os.Unsetenv("DEBUG")
+	err := os.Setenv("PROMETHEUS_REMOTE_WRITE_URL", svr.URL)
+	if err != nil {
+		t.Fatalf("Failed to set environment variable: %v", err)
+	}
+	defer func() {
+		err := os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
+		if err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
+	}()
+	err = os.Setenv("DEBUG", "true")
+	if err != nil {
+		t.Fatalf("Failed to set environment variable: %v", err)
+	}
+	defer func() {
+		err := os.Unsetenv("DEBUG")
+		if err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
+	}()
 
 	c := &Controller{
 		Logger:    &logger.SlogLogger{},
@@ -71,7 +90,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		Persister: &prom.PromClient{},
 	}
 
-	err := c.Init(func() ([]byte, error) { return []byte(""), nil })
+	err = c.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
