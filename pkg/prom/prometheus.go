@@ -113,8 +113,10 @@ func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger types
 
 	logger.Log("debug", "Sending request", slog.String("url", p.RemoteWriteURL), slog.Int("body_size", len(encoded)))
 	response, err := http.DefaultClient.Do(req)
-	if err != nil && response.StatusCode != http.StatusOK {
+	if err != nil {
 		return err
+	} else if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send metrics: %s", response.Status)
 	}
 	logger.Log("debug", "Response", slog.String("status", response.Status), slog.Int("status_code", response.StatusCode))
 

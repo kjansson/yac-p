@@ -16,7 +16,10 @@ type SlogLogger struct {
 func (l *SlogLogger) Init() error {
 
 	debugEnv := os.Getenv("DEBUG")
-	debug, _ := strconv.ParseBool(debugEnv)
+	debug, err := strconv.ParseBool(debugEnv)
+	if err != nil {
+		debug = false
+	}
 
 	logOpts := &slog.HandlerOptions{}
 	if debug {

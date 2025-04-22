@@ -133,7 +133,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 	testGauge.Set(1.0)
 	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExportMetrics()
+	metrics, err := c.Collector.ExportMetrics(c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
 
-	err = c.PersistMetrics(timeseries)
+	err = c.Persister.PersistMetrics(timeseries, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
@@ -205,7 +205,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 	testGauge.Set(1.0)
 	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExportMetrics()
+	metrics, err := c.Collector.ExportMetrics(c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -215,7 +215,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
 
-	err = c.PersistMetrics(timeseries)
+	err = c.Persister.PersistMetrics(timeseries, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
@@ -272,7 +272,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 	testGauge.Set(1.0)
 	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExportMetrics()
+	metrics, err := c.Collector.ExportMetrics(c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -282,7 +282,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
 
-	err = c.PersistMetrics(timeseries)
+	err = c.Persister.PersistMetrics(timeseries, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
