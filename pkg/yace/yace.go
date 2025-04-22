@@ -1,6 +1,6 @@
+// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages for collecting metrics from AWS Cloudwatch.
+// It implements the types.MetricCollector interface.
 package yace
-
-// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages
 
 import (
 	"context"

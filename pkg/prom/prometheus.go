@@ -1,6 +1,6 @@
+// Package prom provides a client for processing and persisting metrics to a Prometheus remote write endpoint.
+// It implements the types.MetricPersister interface.
 package prom
-
-// Package prom provides a client for processing and sending metrics to a Prometheus remote write endpoint.
 
 import (
 	"bytes"

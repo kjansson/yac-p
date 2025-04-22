@@ -1,6 +1,6 @@
-package logger
-
 // Package logger provides a simple logging interface for yac-p
+// It implements the types.Logger interface
+package logger
 
 import (
 	"log/slog"

@@ -7,8 +7,6 @@ discovery:
       - Environment
   jobs:
     - type: AWS/EC2
-      roles:
-        - arn:aws:iam::12345678912:role/org-observability
       regions: 
         - eu-north-1
       metrics:

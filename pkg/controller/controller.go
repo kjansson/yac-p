@@ -1,6 +1,5 @@
+// Package controller provides the yac-p controller struct and its methods to manage the components of the application
 package controller
-
-// Package controller provides the Controller struct and its methods to manage the components of the application
 
 import (
 	"github.com/kjansson/yac-p/pkg/types"

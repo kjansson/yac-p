@@ -1,9 +1,8 @@
-package loaders
-
 // Package loaders provides functions to load configuration files from different sources.
 // Loaders are used when initializing the YACE client and allows for flexibility in how the configuration is loaded.
 // Custom loaders can be used if doing a custom implementation. A loader should return the YACE config file in a byte array along with any errors.
 // Example: func MyCustomLoader() func() ([]byte, error)...
+package loaders
 
 import (
 	"fmt"
