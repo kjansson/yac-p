@@ -26,22 +26,24 @@ type YaceClient struct {
 }
 
 func (y *YaceClient) CollectMetrics(logger Logger, config Config) error {
-	var err error
 	ctx := context.Background()
-	// Query metrics and resources and update the prometheus registry
-	err = yace.UpdateMetrics(ctx, y.Logger, y.Config, y.Registry, y.Client, config.GetYaceOptions(logger)...)
+
+	opts, err := config.GetYaceOptions(logger) // Get the YACE options from the config
 	if err != nil {
-		panic(err)
+		return err
+	}
+	// Query metrics and resources and update the prometheus registry
+	err = yace.UpdateMetrics(ctx, y.Logger, y.Config, y.Registry, y.Client, opts...)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (y *YaceClient) ExtractMetrics(logger Logger) ([]*io_prometheus_client.MetricFamily, error) {
-	var err error
-
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return metrics, nil
 }
@@ -97,7 +99,6 @@ func (y *YaceClient) Init() error {
 		}
 	}
 
-	// Create a new yace client factory
 	y.Client, err = client.NewFactory(y.Logger, y.Config, false)
 	if err != nil {
 		return err

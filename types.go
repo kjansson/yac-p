@@ -26,5 +26,5 @@ type MetricPersister interface {
 
 type Config interface {
 	Init() error
-	GetYaceOptions(logger Logger) []yace.OptionsFunc
+	GetYaceOptions(logger Logger) ([]yace.OptionsFunc, error)
 }

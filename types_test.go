@@ -23,7 +23,11 @@ func (y *YaceMockClient) CollectMetrics(logger Logger, config Config) error {
 	var err error
 	ctx := context.Background()
 	// Query metrics and resources and update the prometheus registry
-	err = yace.UpdateMetrics(ctx, y.Logger, y.Config, y.Registry, y.Client, config.GetYaceOptions(logger)...)
+	opts, err := config.GetYaceOptions(logger)
+	if err != nil {
+		return err
+	}
+	err = yace.UpdateMetrics(ctx, y.Logger, y.Config, y.Registry, y.Client, opts...)
 	if err != nil {
 		panic(err)
 	}
