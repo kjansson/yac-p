@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/kjansson/yac-p/compare/v0.8.0...v0.8.1) (2025-04-22)
+
+
+### Bug Fixes
+
+* cleanup ([#28](https://github.com/kjansson/yac-p/issues/28)) ([16670c9](https://github.com/kjansson/yac-p/commit/16670c936d24d1908d1dba0da6b4c1fddc0fc7b7))
+
 ## [0.8.0](https://github.com/kjansson/yac-p/compare/v0.7.1...v0.8.0) (2025-04-21)
 
 
