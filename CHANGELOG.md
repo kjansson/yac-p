@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/kjansson/yac-p/compare/v0.8.1...v0.9.0) (2025-04-22)
+
+
+### Features
+
+* adding debug logging ([#32](https://github.com/kjansson/yac-p/issues/32)) ([7c12f00](https://github.com/kjansson/yac-p/commit/7c12f00682f2bd318934704c1824ade13e8d553f))
+
 ## [0.8.1](https://github.com/kjansson/yac-p/compare/v0.8.0...v0.8.1) (2025-04-22)
 
 
