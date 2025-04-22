@@ -36,10 +36,6 @@ func (l *SlogLogger) Log(level string, msg string, args ...any) {
 		l.Logger.Warn(msg, args...)
 	case "error":
 		l.Logger.Error(msg, args...)
-	case "fatal":
-		l.Logger.Error(msg, args...)
-	case "panic":
-		l.Logger.Error(msg, args...)
 	default:
 		l.Logger.Info(msg, args...)
 	}
