@@ -39,7 +39,12 @@ func TestConfigLoad(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to set environment variable: %v", err)
 	}
-	defer os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
+	defer func() {
+		err := os.Unsetenv("PROMETHEUS_REMOTE_WRITE_URL")
+		if err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
+	}()
 
 	err = c.Init(tests.GetTestConfigLoader()) // Initialize all components
 	if err != nil {
