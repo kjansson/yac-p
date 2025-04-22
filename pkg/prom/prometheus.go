@@ -1,4 +1,4 @@
-package main
+package prom
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/golang/snappy"
+	"github.com/kjansson/yac-p/pkg/types"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )
@@ -45,7 +46,8 @@ func (p *PromClient) Init() error {
 	return nil
 }
 
-func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger Logger) error {
+// PeristMetrics creates a Prometheus remote write request and sends it to the remote write URL
+func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger types.Logger) error {
 
 	logger.Log("debug", "Sending timeseries", slog.Int("timeseries_count", len(timeSeries)))
 	logger.Log("debug", "Auth type", slog.String("auth_type", p.AuthType))
@@ -128,7 +130,8 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 	}
 }
 
-func processMetrics(metrics []*io_prometheus_client.MetricFamily, logger Logger) ([]prompb.TimeSeries, error) {
+// ProcessMetrics accepts Prometheus metrics gathered from a Prometheus registry, converts and returns them in timeseries format suitable for the Prometheus remote write API
+func ProcessMetrics(metrics []*io_prometheus_client.MetricFamily, logger types.Logger) ([]prompb.TimeSeries, error) {
 
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	timeSeries := []prompb.TimeSeries{} // Create a slice of prometheus time series

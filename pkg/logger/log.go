@@ -1,4 +1,4 @@
-package main
+package logger
 
 import (
 	"log/slog"
@@ -10,6 +10,7 @@ type SlogLogger struct {
 	Logger *slog.Logger
 }
 
+// Init initializes the logger and determines the log level
 func (l *SlogLogger) Init() error {
 
 	debugEnv := os.Getenv("DEBUG")
@@ -26,6 +27,7 @@ func (l *SlogLogger) Init() error {
 	return nil
 }
 
+// Log accepts generic log entry components uses the slog package to log messages
 func (l *SlogLogger) Log(level string, msg string, args ...any) {
 	switch level {
 	case "debug":
@@ -35,10 +37,6 @@ func (l *SlogLogger) Log(level string, msg string, args ...any) {
 	case "warn":
 		l.Logger.Warn(msg, args...)
 	case "error":
-		l.Logger.Error(msg, args...)
-	case "fatal":
-		l.Logger.Error(msg, args...)
-	case "panic":
 		l.Logger.Error(msg, args...)
 	default:
 		l.Logger.Info(msg, args...)

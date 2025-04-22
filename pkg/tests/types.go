@@ -1,10 +1,11 @@
-package main
+package tests
 
 import (
 	"context"
 	"log/slog"
 	"os"
 
+	"github.com/kjansson/yac-p/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
 	"github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/model"
@@ -19,7 +20,7 @@ type YaceMockClient struct {
 	Logger   *slog.Logger
 }
 
-func (y *YaceMockClient) CollectMetrics(logger Logger, config Config) error {
+func (y *YaceMockClient) CollectMetrics(logger types.Logger, config types.Config) error {
 	var err error
 	ctx := context.Background()
 	// Query metrics and resources and update the prometheus registry
@@ -34,7 +35,7 @@ func (y *YaceMockClient) CollectMetrics(logger Logger, config Config) error {
 	return nil
 }
 
-func (y *YaceMockClient) ExtractMetrics(logger Logger) ([]*io_prometheus_client.MetricFamily, error) {
+func (y *YaceMockClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	var err error
 
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
@@ -48,7 +49,7 @@ func (y *YaceMockClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
-func (y *YaceMockClient) Init() error {
+func (y *YaceMockClient) Init(func() ([]byte, error)) error {
 
 	y.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 

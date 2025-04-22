@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
@@ -13,7 +13,7 @@ type Logger interface {
 }
 
 type MetricGatherer interface {
-	Init() error
+	Init(func() ([]byte, error)) error
 	CollectMetrics(Logger, Config) error
 	ExtractMetrics(Logger) ([]*io_prometheus_client.MetricFamily, error)
 	GetRegistry() *prometheus.Registry

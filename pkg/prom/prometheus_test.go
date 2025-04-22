@@ -1,22 +1,40 @@
-package main
+package prom
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/kjansson/yac-p/pkg/controller"
+	"github.com/kjansson/yac-p/pkg/logger"
+	"github.com/kjansson/yac-p/pkg/tests"
+	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+func checkHeaders(r *http.Request) error {
+	if r.Header.Get("Content-Encoding") != "snappy" {
+		return fmt.Errorf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
+	}
+	if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
+		return fmt.Errorf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
+	}
+	if r.Header.Get("Content-Type") != "application/x-protobuf" {
+		return fmt.Errorf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+	}
+	return nil
+}
+
 func TestMetricsProcessing(t *testing.T) {
-	c := &Controller{
-		Logger:   &SlogLogger{},
-		Gatherer: &YaceMockClient{},
+	c := &controller.Controller{
+		Logger:   &logger.SlogLogger{},
+		Gatherer: &tests.YaceMockClient{},
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -39,7 +57,7 @@ func TestMetricsProcessing(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -75,21 +93,16 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		if r.Header.Get("Authorization") != "" {
 			t.Fatalf("Expected no Authorization header, got %s", r.Header.Get("Authorization"))
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
@@ -99,14 +112,14 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		RemoteWriteURL: svr.URL,
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -125,7 +138,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -145,14 +158,9 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		username, password, _ := r.BasicAuth()
 		if username != "testuser" {
@@ -163,7 +171,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
@@ -176,14 +184,14 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		Password:       "testpassword",
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -202,7 +210,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -222,21 +230,16 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		if r.Header.Get("Authorization") != "Bearer testtoken" {
 			t.Fatalf("Expected Authorization Bearer testtoken, got %s", r.Header.Get("Authorization"))
 		}
 	}))
 
-	logger := &SlogLogger{
+	logger := &logger.SlogLogger{
 		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})),
@@ -248,14 +251,14 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		AuthToken:      "testtoken",
 	}
 
-	c := &Controller{
+	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &YaceMockClient{},
-		Config:    &YaceConfig{},
+		Gatherer:  &tests.YaceMockClient{},
+		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init()
+	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
 		t.Fatalf("Failed to initialize gatherer: %v", err)
 	}
@@ -274,7 +277,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := processMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
