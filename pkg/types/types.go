@@ -1,5 +1,7 @@
 package types
 
+// Package types defines interfaces and constants used in yac-p
+
 import (
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	"github.com/prometheus/client_golang/prometheus"

@@ -1,5 +1,7 @@
 package prom
 
+// Package prom provides a client for processing and sending metrics to a Prometheus remote write endpoint.
+
 import (
 	"bytes"
 	"fmt"
