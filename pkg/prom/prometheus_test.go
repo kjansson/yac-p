@@ -1,4 +1,4 @@
-package main
+package prom
 
 import (
 	"fmt"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
-	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/tests"
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,7 +57,7 @@ func TestMetricsProcessing(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -109,7 +108,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		})),
 	}
 
-	promClient := &prom.PromClient{
+	promClient := &PromClient{
 		RemoteWriteURL: svr.URL,
 	}
 
@@ -139,7 +138,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -178,7 +177,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		})),
 	}
 
-	promClient := &prom.PromClient{
+	promClient := &PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "BASIC",
 		Username:       "testuser",
@@ -211,7 +210,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
@@ -246,7 +245,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		})),
 	}
 
-	promClient := &prom.PromClient{
+	promClient := &PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "TOKEN",
 		AuthToken:      "testtoken",
@@ -278,7 +277,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
 
-	timeseries, err := prom.ProcessMetrics(metrics, c.Logger)
+	timeseries, err := ProcessMetrics(metrics, c.Logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}

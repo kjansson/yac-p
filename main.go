@@ -23,7 +23,7 @@ func HandleRequest() {
 		Persister: &prom.PromClient{},
 	}
 
-	err := c.Init(loaders.GetS3Loader()) // Initialize all components
+	err := c.Init(loaders.GetS3Loader()) // Initialize all components, use the S3 loader for Lambda implementation
 	if err != nil {
 		panic(err)
 	}

@@ -53,7 +53,8 @@ func (y *YaceClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
-// Init initializes the YACE client and loads the configuration
+// Init initializes the YACE client
+// It expects a function for loading the yace configuration file
 func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 	var err error
 
@@ -67,7 +68,7 @@ func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 	}
 
 	conf := config.ScrapeConf{}
-	err = yaml.Unmarshal(contents, conf)
+	err = yaml.Unmarshal(contents, &conf)
 	if err != nil {
 		return err
 	}

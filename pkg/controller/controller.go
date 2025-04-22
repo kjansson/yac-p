@@ -21,7 +21,7 @@ func (c *Controller) Init(configFileLoader func() ([]byte, error)) error {
 	if err := c.Config.Init(); err != nil {
 		return err
 	}
-	if err := c.Gatherer.Init(configFileLoader); err != nil {
+	if err := c.Gatherer.Init(configFileLoader); err != nil { // Initialize the metric gatherer with the config file loader
 		return err
 	}
 	if err := c.Persister.Init(); err != nil {
