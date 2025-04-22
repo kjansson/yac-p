@@ -1,5 +1,8 @@
 package tests
 
+// Package tests provides test types and functions for yac-p
+
+// GetTestConfigLoader returns a function that loads a static test configuration
 func GetTestConfigLoader() func() ([]byte, error) {
 	return func() ([]byte, error) {
 		return []byte(`

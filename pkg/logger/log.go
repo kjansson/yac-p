@@ -1,6 +1,6 @@
 package logger
 
-// Package logger provides a simple logging interface yac-p
+// Package logger provides a simple logging interface for yac-p
 
 import (
 	"log/slog"
@@ -16,7 +16,10 @@ type SlogLogger struct {
 func (l *SlogLogger) Init() error {
 
 	debugEnv := os.Getenv("DEBUG")
-	debug, _ := strconv.ParseBool(debugEnv)
+	debug, err := strconv.ParseBool(debugEnv)
+	if err != nil {
+		debug = false
+	}
 
 	logOpts := &slog.HandlerOptions{}
 	if debug {

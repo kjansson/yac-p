@@ -41,8 +41,8 @@ func (y *YaceClient) CollectMetrics(logger types.Logger, config types.Config) er
 	return nil
 }
 
-// ExtractMetrics gathers the metrics from the prometheus registry
-func (y *YaceClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
+// ExportMetrics exports metrics from the prometheus registry
+func (y *YaceClient) ExportMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (y *YaceClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_clien
 	return metrics, nil
 }
 
-// GetRegistry returns the prometheus registry
+// GetRegistry returns the prometheus registry used by YACE, this is mostly used for testing
 func (y *YaceClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
@@ -112,6 +112,7 @@ func (y *YaceClient) Init(getConfig func() ([]byte, error)) error {
 	return nil
 }
 
+// See YACE documentation for more details on the options
 type YaceOptions struct {
 	YaceCloudwatchConcurrencyPerApiLimitEnabled       string
 	YaceCloudwatchConcurrencyListMetricsLimit         string
@@ -133,6 +134,7 @@ func (c *YaceOptions) Init() error {
 	return nil
 }
 
+// GetYaceOptions returns the YACE options function based on the config
 func (c *YaceOptions) GetYaceOptions(logger types.Logger) ([]yace.OptionsFunc, error) {
 	optFuncs := []yace.OptionsFunc{}
 	var cloudwatchPerApiConcurrencyLimit bool

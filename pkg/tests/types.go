@@ -1,5 +1,7 @@
 package tests
 
+// Package tests provides test types and functions for yac-p
+
 import (
 	"context"
 	"log/slog"
@@ -35,7 +37,7 @@ func (y *YaceMockClient) CollectMetrics(logger types.Logger, config types.Config
 	return nil
 }
 
-func (y *YaceMockClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
+func (y *YaceMockClient) ExportMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	var err error
 
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry

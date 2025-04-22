@@ -22,16 +22,17 @@ import (
 )
 
 type PromClient struct {
-	RemoteWriteURL   string
-	AuthType         string
-	AuthToken        string
-	Username         string
-	Password         string
-	Region           string
-	PrometheusRegion string
-	AWSRoleARN       string
+	RemoteWriteURL   string // The URL of the Prometheus remote write endpoint
+	AuthType         string // The type of authentication to use (AWS, BASIC, TOKEN)
+	AuthToken        string // The token to use for authentication (if using TOKEN auth)
+	Username         string // The username to use for authentication (if using BASIC auth)
+	Password         string // The password to use for authentication (if using BASIC auth)
+	Region           string // The AWS region to use for authentication (if using AWS auth)
+	PrometheusRegion string // The AWS region of the Prometheus remote write endpoint (if using Amazon Managed Prometheus)
+	AWSRoleARN       string // The ARN of the AWS role to assume for remote write (if using Amazon Managed Prometheus cross-account)
 }
 
+// Init initializes the PromClient with the remote write URL and authentication details
 func (p *PromClient) Init() error {
 	p.RemoteWriteURL = os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")
 	p.AuthType = os.Getenv("AUTH_TYPE")
@@ -112,8 +113,10 @@ func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger types
 
 	logger.Log("debug", "Sending request", slog.String("url", p.RemoteWriteURL), slog.Int("body_size", len(encoded)))
 	response, err := http.DefaultClient.Do(req)
-	if err != nil && response.StatusCode != http.StatusOK {
+	if err != nil {
 		return err
+	} else if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send metrics: %s", response.Status)
 	}
 	logger.Log("debug", "Response", slog.String("status", response.Status), slog.Int("status_code", response.StatusCode))
 

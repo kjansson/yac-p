@@ -19,7 +19,7 @@ func HandleRequest() {
 	c := &controller.Controller{
 		Logger:    &logger.SlogLogger{},
 		Config:    &yace.YaceOptions{},
-		Gatherer:  &yace.YaceClient{},
+		Collector: &yace.YaceClient{},
 		Persister: &prom.PromClient{},
 	}
 
@@ -39,7 +39,7 @@ func HandleRequest() {
 
 	c.Logger.Log("debug", "Extracting metrics")
 	// Extract the metrics from the prometheus registry
-	metrics, err := c.ExtractMetrics()
+	metrics, err := c.ExportMetrics()
 	if err != nil {
 		panic(err)
 	}
