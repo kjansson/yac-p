@@ -41,7 +41,7 @@ func GetS3Loader() func() ([]byte, error) {
 	}
 }
 
-func LocalFileLoader() func() ([]byte, error) {
+func GetLocalFileLoader() func() ([]byte, error) {
 	return func() ([]byte, error) {
 		var content []byte
 		configFilePath := os.Getenv("CONFIG_FILE_PATH")
