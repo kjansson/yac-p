@@ -30,13 +30,13 @@ func checkHeaders(r *http.Request) error {
 
 func TestMetricsProcessing(t *testing.T) {
 	c := &controller.Controller{
-		Logger:   &logger.SlogLogger{},
-		Gatherer: &tests.YaceMockClient{},
+		Logger:    &logger.SlogLogger{},
+		Collector: &tests.YaceMockClient{},
 	}
 
-	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
-		t.Fatalf("Failed to initialize gatherer: %v", err)
+		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
 	err = c.Logger.Init()
 	if err != nil {
@@ -50,9 +50,9 @@ func TestMetricsProcessing(t *testing.T) {
 		},
 	)
 	testGauge.Set(1.0)
-	c.Gatherer.GetRegistry().MustRegister(testGauge)
+	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExtractMetrics()
+	metrics, err := c.ExportMetrics()
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -114,14 +114,14 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &tests.YaceMockClient{},
+		Collector: &tests.YaceMockClient{},
 		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
-		t.Fatalf("Failed to initialize gatherer: %v", err)
+		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
 
 	testGauge := prometheus.NewGauge(
@@ -131,9 +131,9 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		},
 	)
 	testGauge.Set(1.0)
-	c.Gatherer.GetRegistry().MustRegister(testGauge)
+	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExtractMetrics()
+	metrics, err := c.ExportMetrics()
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -186,14 +186,14 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &tests.YaceMockClient{},
+		Collector: &tests.YaceMockClient{},
 		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
-		t.Fatalf("Failed to initialize gatherer: %v", err)
+		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
 
 	testGauge := prometheus.NewGauge(
@@ -203,9 +203,9 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		},
 	)
 	testGauge.Set(1.0)
-	c.Gatherer.GetRegistry().MustRegister(testGauge)
+	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExtractMetrics()
+	metrics, err := c.ExportMetrics()
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}
@@ -253,14 +253,14 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:    logger,
-		Gatherer:  &tests.YaceMockClient{},
+		Collector: &tests.YaceMockClient{},
 		Config:    &yace.YaceOptions{},
 		Persister: promClient,
 	}
 
-	err := c.Gatherer.Init(func() ([]byte, error) { return []byte(""), nil })
+	err := c.Collector.Init(func() ([]byte, error) { return []byte(""), nil })
 	if err != nil {
-		t.Fatalf("Failed to initialize gatherer: %v", err)
+		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
 
 	testGauge := prometheus.NewGauge(
@@ -270,9 +270,9 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		},
 	)
 	testGauge.Set(1.0)
-	c.Gatherer.GetRegistry().MustRegister(testGauge)
+	c.Collector.GetRegistry().MustRegister(testGauge)
 
-	metrics, err := c.ExtractMetrics()
+	metrics, err := c.ExportMetrics()
 	if err != nil {
 		t.Fatalf("Failed to extract metrics: %v", err)
 	}

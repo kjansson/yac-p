@@ -11,7 +11,7 @@ import (
 type Controller struct {
 	Logger    types.Logger
 	Config    types.Config
-	Gatherer  types.MetricGatherer
+	Collector types.MetricCollector
 	Persister types.MetricPersister
 }
 
@@ -23,7 +23,7 @@ func (c *Controller) Init(configFileLoader func() ([]byte, error)) error {
 	if err := c.Config.Init(); err != nil {
 		return err
 	}
-	if err := c.Gatherer.Init(configFileLoader); err != nil { // Initialize the metric gatherer with the config file loader
+	if err := c.Collector.Init(configFileLoader); err != nil { // Initialize the metric Collector with the config file loader
 		return err
 	}
 	if err := c.Persister.Init(); err != nil {
@@ -37,14 +37,14 @@ func (c *Controller) Log(level string, msg string, args ...any) {
 	c.Logger.Log(level, msg, args...)
 }
 
-// GetRegistry returns the prometheus registry from the gatherer component
+// GetRegistry returns the prometheus registry from the Collector component
 func (c *Controller) CollectMetrics() error {
-	return c.Gatherer.CollectMetrics(c.Logger, c.Config)
+	return c.Collector.CollectMetrics(c.Logger, c.Config)
 }
 
-// GetRegistry extracts the metrics from the prometheus registry in the gatherer component
-func (c *Controller) ExtractMetrics() ([]*io_prometheus_client.MetricFamily, error) {
-	metrics, err := c.Gatherer.ExtractMetrics(c.Logger)
+// GetRegistry extracts the metrics from the prometheus registry in the Collector component
+func (c *Controller) ExportMetrics() ([]*io_prometheus_client.MetricFamily, error) {
+	metrics, err := c.Collector.ExportMetrics(c.Logger)
 	if err != nil {
 		return nil, err
 	}

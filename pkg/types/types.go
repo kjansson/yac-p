@@ -14,10 +14,10 @@ type Logger interface {
 	Log(level string, msg string, args ...any)
 }
 
-type MetricGatherer interface {
+type MetricCollector interface {
 	Init(func() ([]byte, error)) error
 	CollectMetrics(Logger, Config) error
-	ExtractMetrics(Logger) ([]*io_prometheus_client.MetricFamily, error)
+	ExportMetrics(Logger) ([]*io_prometheus_client.MetricFamily, error)
 	GetRegistry() *prometheus.Registry
 }
 
