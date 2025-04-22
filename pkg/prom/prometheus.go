@@ -46,6 +46,7 @@ func (p *PromClient) Init() error {
 	return nil
 }
 
+// PeristMetrics creates a Prometheus remote write request and sends it to the remote write URL
 func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger types.Logger) error {
 
 	logger.Log("debug", "Sending timeseries", slog.Int("timeseries_count", len(timeSeries)))
@@ -129,6 +130,7 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 	}
 }
 
+// ProcessMetrics accepts Prometheus metrics gathered from a Prometheus registry, converts and returns them in timeseries format suitable for the Prometheus remote write API
 func ProcessMetrics(metrics []*io_prometheus_client.MetricFamily, logger types.Logger) ([]prompb.TimeSeries, error) {
 
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)

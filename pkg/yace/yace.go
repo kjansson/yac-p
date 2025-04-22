@@ -31,6 +31,7 @@ type YaceClient struct {
 	Logger   *slog.Logger
 }
 
+// CollectMetrics performs the Cloudwatch metrics collection and updates the prometheus registry
 func (y *YaceClient) CollectMetrics(logger types.Logger, config types.Config) error {
 	ctx := context.Background()
 
@@ -46,6 +47,7 @@ func (y *YaceClient) CollectMetrics(logger types.Logger, config types.Config) er
 	return nil
 }
 
+// ExtractMetrics gathers the metrics from the prometheus registry
 func (y *YaceClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_client.MetricFamily, error) {
 	metrics, err := y.Registry.Gather() // Gather the metrics from the prometheus registry
 	if err != nil {
@@ -54,10 +56,12 @@ func (y *YaceClient) ExtractMetrics(logger types.Logger) ([]*io_prometheus_clien
 	return metrics, nil
 }
 
+// GetRegistry returns the prometheus registry
 func (y *YaceClient) GetRegistry() *prometheus.Registry {
 	return y.Registry
 }
 
+// Init initializes the YACE client and loads the configuration from S3
 func (y *YaceClient) Init() error {
 	var err error
 

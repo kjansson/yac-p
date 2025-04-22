@@ -7,10 +7,6 @@ import (
 	"github.com/prometheus/prometheus/prompb"
 )
 
-const (
-	prom_rw_version_header_name = "X-Prometheus-Remote-Write-Version"
-)
-
 type Logger interface {
 	Init() error
 	Log(level string, msg string, args ...any)
