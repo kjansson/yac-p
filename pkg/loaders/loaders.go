@@ -15,10 +15,10 @@ func GetS3Loader() func() ([]byte, error) {
 		var content []byte
 		configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
 		if configS3Bucket != "" && configS3Path != "" {
-			sess, err := createAWSSession()
-			if err != nil {
-				return nil, err
-			}
+			sess, err := session.NewSessionWithOptions(session.Options{
+				Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
+				SharedConfigState: session.SharedConfigEnable,
+			})
 			s3svc := s3.New(sess, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
 			obj, err := s3svc.GetObject(&s3.GetObjectInput{
 				Bucket: aws.String(configS3Bucket),
@@ -36,15 +36,4 @@ func GetS3Loader() func() ([]byte, error) {
 		}
 		return content, nil
 	}
-}
-
-func createAWSSession() (*session.Session, error) {
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:            aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))},
-		SharedConfigState: session.SharedConfigEnable,
-	})
-	if err != nil {
-		return sess, err
-	}
-	return sess, err
 }
