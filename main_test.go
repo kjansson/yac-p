@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +15,19 @@ import (
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
 )
+
+func checkHeaders(r *http.Request) error {
+	if r.Header.Get("Content-Encoding") != "snappy" {
+		return fmt.Errorf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
+	}
+	if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
+		return fmt.Errorf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
+	}
+	if r.Header.Get("Content-Type") != "application/x-protobuf" {
+		return fmt.Errorf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+	}
+	return nil
+}
 
 func TestMetricsProcessing(t *testing.T) {
 	c := &controller.Controller{
@@ -80,14 +94,9 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		if r.Header.Get("Authorization") != "" {
 			t.Fatalf("Expected no Authorization header, got %s", r.Header.Get("Authorization"))
@@ -150,14 +159,9 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		username, password, _ := r.BasicAuth()
 		if username != "testuser" {
@@ -227,14 +231,9 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 
-		if r.Header.Get("Content-Encoding") != "snappy" {
-			t.Fatalf("Expected snappy encoding, got %s", r.Header.Get("Content-Encoding"))
-		}
-		if r.Header.Get("X-Prometheus-Remote-Write-Version") != "0.1.0" {
-			t.Fatalf("Expected X-Prometheus-Remote-Write-Version 0.1.0, got %s", r.Header.Get("X-Prometheus-Remote-Write-Version"))
-		}
-		if r.Header.Get("Content-Type") != "application/x-protobuf" {
-			t.Fatalf("Expected application/x-protobuf, got %s", r.Header.Get("Content-Type"))
+		err := checkHeaders(r)
+		if err != nil {
+			t.Fatalf("Header check failed: %v", err)
 		}
 		if r.Header.Get("Authorization") != "Bearer testtoken" {
 			t.Fatalf("Expected Authorization Bearer testtoken, got %s", r.Header.Get("Authorization"))
