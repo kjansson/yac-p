@@ -185,7 +185,10 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 	}))
 
 	logger := &logger.SlogLogger{}
-	logger.Init(types.Config{})
+	err := logger.Init(types.Config{})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	p := &PromClient{
 		RemoteWriteURL: svr.URL,
@@ -193,7 +196,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		AuthToken:      "testtoken",
 	}
 
-	err := p.PersistMetrics(createTestTimeSeries(), logger)
+	err = p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
