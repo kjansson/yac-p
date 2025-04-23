@@ -2,30 +2,49 @@
 package controller
 
 import (
+	"github.com/kjansson/yac-p/pkg/logger"
+	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/pkg/yace"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )
 
 type Controller struct {
-	Logger    types.Logger
-	Config    types.Config
-	Collector types.MetricCollector
-	Persister types.MetricPersister
+	Logger     types.Logger
+	YaceConfig types.YaceConfig
+	Collector  types.MetricCollector
+	Persister  types.MetricPersister
+	Config     types.Config
+}
+
+func NewController(config types.Config) (*Controller, error) {
+	c := &Controller{
+		Config:     config,
+		Logger:     &logger.SlogLogger{},
+		Collector:  &yace.YaceClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  &prom.PromClient{},
+	}
+	err := c.Init()
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 // Init initializes all components of the controller
-func (c *Controller) Init(configFileLoader func() ([]byte, error)) error {
-	if err := c.Logger.Init(); err != nil {
+func (c *Controller) Init() error {
+	if err := c.Logger.Init(c.Config); err != nil {
 		return err
 	}
-	if err := c.Config.Init(); err != nil {
+	if err := c.YaceConfig.Init(c.Config); err != nil {
 		return err
 	}
-	if err := c.Collector.Init(configFileLoader); err != nil { // Initialize the metric Collector with the config file loader
+	if err := c.Collector.Init(c.Config); err != nil { // Initialize the metric Collector with the config file loader
 		return err
 	}
-	if err := c.Persister.Init(); err != nil {
+	if err := c.Persister.Init(c.Config); err != nil {
 		return err
 	}
 	return nil
@@ -38,7 +57,7 @@ func (c *Controller) Log(level string, msg string, args ...any) {
 
 // GetRegistry returns the prometheus registry from the Collector component
 func (c *Controller) CollectMetrics() error {
-	return c.Collector.CollectMetrics(c.Logger, c.Config)
+	return c.Collector.CollectMetrics(c.Logger, c.YaceConfig)
 }
 
 // GetRegistry extracts the metrics from the prometheus registry in the Collector component

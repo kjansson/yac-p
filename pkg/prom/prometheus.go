@@ -33,19 +33,19 @@ type PromClient struct {
 }
 
 // Init initializes the PromClient with the remote write URL and authentication details
-func (p *PromClient) Init() error {
-	p.RemoteWriteURL = os.Getenv("PROMETHEUS_REMOTE_WRITE_URL")
-	p.AuthType = os.Getenv("AUTH_TYPE")
-	p.AuthToken = os.Getenv("TOKEN")
-	p.Username = os.Getenv("USERNAME")
-	p.Password = os.Getenv("PASSWORD")
-	p.Region = os.Getenv("AWS_REGION")
-	p.PrometheusRegion = os.Getenv("PROMETHEUS_REGION")
-	p.AWSRoleARN = os.Getenv("AWS_ROLE_ARN")
-
-	if p.RemoteWriteURL == "" {
-		return fmt.Errorf("PROMETHEUS_REMOTE_WRITE_URL is not set")
+func (p *PromClient) Init(config types.Config) error {
+	if config.RemoteWriteURL == "" {
+		return fmt.Errorf("prometheus remote write URL must be set")
 	}
+	p.RemoteWriteURL = config.RemoteWriteURL
+	p.AuthType = config.AuthType
+	p.AuthToken = config.AuthToken
+	p.Username = config.Username
+	p.Password = config.Password
+	p.Region = config.Region
+	p.PrometheusRegion = config.PrometheusRegion
+	p.AWSRoleARN = config.AWSRoleARN
+
 	return nil
 }
 
@@ -149,11 +149,11 @@ func ProcessMetrics(metrics []*io_prometheus_client.MetricFamily, logger types.L
 		for _, metric := range family.GetMetric() { // Range through the metrics of the metric type
 			ts := prompb.TimeSeries{}
 
+			// This one is special, we need to add the metric name in the special label that prometheus expects
+			ts.Labels = append(ts.Labels, prompb.Label{Name: "__name__", Value: metricName})
 			for _, label := range metric.GetLabel() {
 				ts.Labels = append(ts.Labels, prompb.Label{Name: label.GetName(), Value: label.GetValue()}) // Create prometheus time series labels
 			}
-			// This one is special, we need to add the metric name in the special label that prometheus expects
-			ts.Labels = append(ts.Labels, prompb.Label{Name: "__name__", Value: metricName})
 
 			value, err := getValue(metricType, metric) // Extract the value of the metric based on the metric type
 			if err != nil {

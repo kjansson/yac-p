@@ -1,13 +1,14 @@
 package main
 
 import (
+	"os"
+
 	"github.com/aws/aws-lambda-go/lambda"
 
+	"github.com/kjansson/defcon"
 	"github.com/kjansson/yac-p/pkg/controller"
-	"github.com/kjansson/yac-p/pkg/loaders"
-	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
-	"github.com/kjansson/yac-p/pkg/yace"
+	"github.com/kjansson/yac-p/pkg/types"
 )
 
 func main() {
@@ -16,14 +17,24 @@ func main() {
 
 func HandleRequest() {
 
-	c := &controller.Controller{
-		Logger:    &logger.SlogLogger{},
-		Config:    &yace.YaceOptions{},
-		Collector: &yace.YaceClient{},
-		Persister: &prom.PromClient{},
+	config := &types.Config{
+		ConfigFileLoader: GetS3Loader(), // Use the S3 loader for Lambda implementation
+		RemoteWriteURL:   os.Getenv("PROMETHEUS_REMOTE_WRITE_URL"),
+		AuthType:         os.Getenv("AUTH_TYPE"),
+		AuthToken:        os.Getenv("TOKEN"),
+		Username:         os.Getenv("USERNAME"),
+		Password:         os.Getenv("PASSWORD"),
+		Region:           os.Getenv("AWS_REGION"),
+		PrometheusRegion: os.Getenv("PROMETHEUS_REGION"),
+		AWSRoleARN:       os.Getenv("AWS_ROLE_ARN"),
 	}
 
-	err := c.Init(loaders.GetS3Loader()) // Initialize all components, use the S3 loader for Lambda implementation
+	err := defcon.CheckConfigStruct(config) // Check the config struct for required fields
+	if err != nil {
+		panic(err)
+	}
+
+	c, err := controller.NewController(*config) // Create a new controller instance
 	if err != nil {
 		panic(err)
 	}
