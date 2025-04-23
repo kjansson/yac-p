@@ -1,5 +1,5 @@
 // Package tests provides test types and functions for yac-p
-package tests
+package test_utils
 
 import (
 	"context"

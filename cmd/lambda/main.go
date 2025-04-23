@@ -6,11 +6,8 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/kjansson/yac-p/pkg/controller"
-	"github.com/kjansson/yac-p/pkg/loaders"
-	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/types"
-	"github.com/kjansson/yac-p/pkg/yace"
 )
 
 func main() {
@@ -20,7 +17,7 @@ func main() {
 func HandleRequest() {
 
 	config := &types.Config{
-		ConfigFileLoader: loaders.GetS3Loader(), // Use the S3 loader for Lambda implementation
+		ConfigFileLoader: GetS3Loader(), // Use the S3 loader for Lambda implementation
 		RemoteWriteURL:   os.Getenv("PROMETHEUS_REMOTE_WRITE_URL"),
 		AuthType:         os.Getenv("AUTH_TYPE"),
 		AuthToken:        os.Getenv("TOKEN"),
@@ -39,11 +36,7 @@ func HandleRequest() {
 	}
 
 	c := &controller.Controller{
-		Logger:     &logger.SlogLogger{},
-		YaceConfig: &yace.YaceOptions{},
-		Collector:  &yace.YaceClient{},
-		Persister:  &prom.PromClient{},
-		Config:     *config,
+		Config: *config,
 	}
 
 	err := c.Init() // Initialize all components, use the S3 loader for Lambda implementation

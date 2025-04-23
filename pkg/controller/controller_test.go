@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kjansson/yac-p/internal/test_utils"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/prom"
-	"github.com/kjansson/yac-p/pkg/tests"
 	"github.com/kjansson/yac-p/pkg/types"
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
@@ -30,12 +30,12 @@ func checkHeaders(r *http.Request) error {
 func TestConfigLoad(t *testing.T) {
 	c := &Controller{
 		Logger:     &logger.SlogLogger{},
-		Collector:  &tests.YaceMockClient{},
+		Collector:  &test_utils.YaceMockClient{},
 		YaceConfig: &yace.YaceOptions{},
 		Persister:  &prom.PromClient{},
 		Config: types.Config{
 			RemoteWriteURL:   "http://localhost:1234",
-			ConfigFileLoader: tests.GetTestConfigLoader(),
+			ConfigFileLoader: test_utils.GetTestConfigLoader(),
 		},
 	}
 
@@ -62,12 +62,12 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	c := &Controller{
 		Logger:     &logger.SlogLogger{},
-		Collector:  &tests.YaceMockClient{},
+		Collector:  &test_utils.YaceMockClient{},
 		YaceConfig: &yace.YaceOptions{},
 		Persister:  &prom.PromClient{},
 		Config: types.Config{
 			RemoteWriteURL:   svr.URL,
-			ConfigFileLoader: tests.GetTestConfigLoader(),
+			ConfigFileLoader: test_utils.GetTestConfigLoader(),
 		},
 	}
 

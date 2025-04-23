@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kjansson/yac-p/internal/test_utils"
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
-	"github.com/kjansson/yac-p/pkg/tests"
 	"github.com/kjansson/yac-p/pkg/types"
 	"github.com/kjansson/yac-p/pkg/yace"
 	"github.com/prometheus/client_golang/prometheus"
@@ -32,7 +32,7 @@ func checkHeaders(r *http.Request) error {
 func TestMetricsProcessing(t *testing.T) {
 	c := &controller.Controller{
 		Logger:    &logger.SlogLogger{},
-		Collector: &tests.YaceMockClient{},
+		Collector: &test_utils.YaceMockClient{},
 	}
 
 	err := c.Collector.Init(types.Config{})
@@ -40,7 +40,7 @@ func TestMetricsProcessing(t *testing.T) {
 		t.Fatalf("Failed to initialize Collector: %v", err)
 	}
 	err = c.Logger.Init(types.Config{
-		ConfigFileLoader: tests.GetTestConfigLoader(),
+		ConfigFileLoader: test_utils.GetTestConfigLoader(),
 	})
 	if err != nil {
 		t.Fatalf("Failed to initialize logger: %v", err)
@@ -117,7 +117,7 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:     logger,
-		Collector:  &tests.YaceMockClient{},
+		Collector:  &test_utils.YaceMockClient{},
 		YaceConfig: &yace.YaceOptions{},
 		Persister:  promClient,
 	}
@@ -189,7 +189,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:     logger,
-		Collector:  &tests.YaceMockClient{},
+		Collector:  &test_utils.YaceMockClient{},
 		YaceConfig: &yace.YaceOptions{},
 		Persister:  promClient,
 	}
@@ -258,7 +258,7 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 
 	c := &controller.Controller{
 		Logger:     logger,
-		Collector:  &tests.YaceMockClient{},
+		Collector:  &test_utils.YaceMockClient{},
 		YaceConfig: &yace.YaceOptions{},
 		Persister:  promClient,
 	}
