@@ -1,8 +1,7 @@
 package logger
 
 import (
-	"bytes"
-	"fmt"
+	"encoding/json"
 	"io"
 	"os"
 	"testing"
@@ -10,59 +9,96 @@ import (
 	"github.com/kjansson/yac-p/pkg/types"
 )
 
-func TestMetricsProcessing(t *testing.T) {
+// {"time":"2025-04-23T16:53:55.002724+02:00","level":"INFO","msg":"test message","key1":"value1"}
+type TestLogEntry struct {
+	Time  string `json:"time"`
+	Level string `json:"level"`
+	Msg   string `json:"msg"`
+	Key1  string `json:"key1"`
+}
 
-	old := os.Stdout // keep backup of the real stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
+func TestLogLevel(t *testing.T) {
 
 	l := &SlogLogger{}
 
+	tmpFile, err := os.CreateTemp(".", "logtest")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+
+	defer func() {
+		err := os.Remove(tmpFile.Name())
+		if err != nil {
+			t.Fatalf("Failed to remove temp file: %v", err)
+		}
+	}()
+
+	defer func() {
+		err := tmpFile.Close()
+		if err != nil {
+			t.Fatalf("Failed to close temp file: %v", err)
+		}
+	}()
+
 	l.Init(types.Config{
-		Debug: true,
+		Debug:          false,
+		LogDestination: tmpFile,
 	})
 
-	// c := controller.Controller{
-	// 	Config: types.Config{
-	// 		//Debug:            true,
-	// 	},
-	// }
+	l.Log("debug", "test message", "key1", "value1")
 
-	// c.Init()
-	// c := controller.NewController(types.Config{
-	// 	Debug: true,
-	// })
+	entry := make([]byte, 256)
+	n, err := tmpFile.ReadAt(entry, 0)
+	if err != nil && err != io.EOF {
+		t.Fatalf("Failed to read from temp file: %v", err)
+	}
 
-	// c := &controller.Controller{
-	// 	Logger:     &SlogLogger{},
-	// 	Collector:  &test_utils.YaceMockClient{},
-	// 	YaceConfig: &yace.YaceOptions{},
-	// 	Persister:  &prom.PromClient{},
-	// 	Config: types.Config{
-	// 		// RemoteWriteURL:   "http://localhost:1234",
-	// 		// ConfigFileLoader: test_utils.GetTestConfigLoader(),
+	if n > 0 {
+		t.Fatalf("Expected no logs due to lower log level attempt, got '%s'", string(entry))
+	}
+}
 
-	// 		Debug: true,
-	// 	},
-	// }
+func TestLogFormat(t *testing.T) {
+
+	l := &SlogLogger{}
+
+	tmpFile, err := os.CreateTemp(".", "logtest")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+
+	defer func() {
+		err := os.Remove(tmpFile.Name())
+		if err != nil {
+			t.Fatalf("Failed to remove temp file: %v", err)
+		}
+	}()
+
+	defer func() {
+		err := tmpFile.Close()
+		if err != nil {
+			t.Fatalf("Failed to close temp file: %v", err)
+		}
+	}()
+
+	l.Init(types.Config{
+		Debug:          false,
+		LogDestination: tmpFile,
+		LogFormat:      "json",
+	})
 
 	l.Log("info", "test message", "key1", "value1")
 
-	outC := make(chan string)
+	entry := make([]byte, 256)
+	n, err := tmpFile.ReadAt(entry, 0)
+	if err != nil && err != io.EOF {
+		t.Fatalf("Failed to read from temp file: %v", err)
+	}
 
-	go func() {
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
-		outC <- buf.String()
-	}()
-
-	// // back to normal state
-	w.Close()
-	os.Stdout = old // restoring the real stdout
-	out := <-outC
-
-	// reading our temp stdout
-	fmt.Println("previous output:")
-	fmt.Print(out)
-
+	// Check if the log entry is in JSON format
+	entryJSON := TestLogEntry{}
+	err = json.Unmarshal(entry[:n], &entryJSON)
+	if err != nil {
+		t.Fatalf("Expected JSON format, got '%s'", string(entry[:n]))
+	}
 }

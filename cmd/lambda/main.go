@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 
+	"github.com/kjansson/defcon"
 	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/types"
@@ -26,23 +27,12 @@ func HandleRequest() {
 		Region:           os.Getenv("AWS_REGION"),
 		PrometheusRegion: os.Getenv("PROMETHEUS_REGION"),
 		AWSRoleARN:       os.Getenv("AWS_ROLE_ARN"),
-		YaceCloudwatchConcurrencyPerApiLimitEnabled:       os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED"),
-		YaceCloudwatchConcurrencyListMetricsLimit:         os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT"),
-		YaceCloudwatchConcurrencyGetMetricDataLimit:       os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT"),
-		YaceCloudwatchConcurrencyGetMetricStatisticsLimit: os.Getenv("YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT"),
-		YaceMetricsPerQuery:                               os.Getenv("YACE_METRICS_PER_QUERY"),
-		YaceTaggingAPIConcurrency:                         os.Getenv("YACE_TAGGING_API_CONCURRENCY"),
-		YaceCloudwatchConcurrency:                         os.Getenv("YACE_CLOUDWATCH_CONCURRENCY"),
 	}
 
-	// c := &controller.Controller{
-	// 	Config: *config,
-	// }
-
-	// err := c.Init() // Initialize all components, use the S3 loader for Lambda implementation
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := defcon.CheckConfigStruct(config) // Check the config struct for required fields
+	if err != nil {
+		panic(err)
+	}
 
 	c, err := controller.NewController(*config) // Create a new controller instance
 	if err != nil {

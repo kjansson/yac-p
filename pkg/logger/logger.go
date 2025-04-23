@@ -23,7 +23,18 @@ func (l *SlogLogger) Init(config types.Config) error {
 		logOpts.Level = slog.LevelInfo
 	}
 
-	l.Logger = slog.New(slog.NewTextHandler(os.Stdout, logOpts))
+	var destination *os.File
+	if config.LogDestination != nil {
+		destination = config.LogDestination
+	} else {
+		destination = os.Stdout
+	}
+
+	if config.LogFormat == "json" || config.LogFormat == "JSON" {
+		l.Logger = slog.New(slog.NewJSONHandler(destination, logOpts))
+	} else {
+		l.Logger = slog.New(slog.NewTextHandler(destination, logOpts))
+	}
 	return nil
 }
 

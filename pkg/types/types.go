@@ -3,6 +3,8 @@ package types
 // Package types defines interfaces and constants used in yac-p
 
 import (
+	"os"
+
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
@@ -49,4 +51,6 @@ type Config struct {
 	YaceTaggingAPIConcurrency                         string
 	YaceCloudwatchConcurrency                         string
 	ConfigFileLoader                                  func() ([]byte, error)
+	LogFormat                                         string
+	LogDestination                                    *os.File
 }
