@@ -35,11 +35,16 @@ func HandleRequest() {
 		YaceCloudwatchConcurrency:                         os.Getenv("YACE_CLOUDWATCH_CONCURRENCY"),
 	}
 
-	c := &controller.Controller{
-		Config: *config,
-	}
+	// c := &controller.Controller{
+	// 	Config: *config,
+	// }
 
-	err := c.Init() // Initialize all components, use the S3 loader for Lambda implementation
+	// err := c.Init() // Initialize all components, use the S3 loader for Lambda implementation
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	c, err := controller.NewController(*config) // Create a new controller instance
 	if err != nil {
 		panic(err)
 	}

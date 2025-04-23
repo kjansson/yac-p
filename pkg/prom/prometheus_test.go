@@ -2,18 +2,15 @@ package prom
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
-	"github.com/kjansson/yac-p/internal/test_utils"
-	"github.com/kjansson/yac-p/pkg/controller"
 	"github.com/kjansson/yac-p/pkg/logger"
 	"github.com/kjansson/yac-p/pkg/types"
-	"github.com/kjansson/yac-p/pkg/yace"
-	"github.com/prometheus/client_golang/prometheus"
+	io_prometheus_client "github.com/prometheus/client_model/go"
+	"github.com/prometheus/prometheus/prompb"
+	"google.golang.org/protobuf/proto"
 )
 
 func checkHeaders(r *http.Request) error {
@@ -29,43 +26,47 @@ func checkHeaders(r *http.Request) error {
 	return nil
 }
 
-func TestMetricsProcessing(t *testing.T) {
-	c := &controller.Controller{
-		Logger:    &logger.SlogLogger{},
-		Collector: &test_utils.YaceMockClient{},
-	}
-
-	err := c.Collector.Init(types.Config{})
-	if err != nil {
-		t.Fatalf("Failed to initialize Collector: %v", err)
-	}
-	err = c.Logger.Init(types.Config{
-		ConfigFileLoader: test_utils.GetTestConfigLoader(),
-	})
-	if err != nil {
-		t.Fatalf("Failed to initialize logger: %v", err)
-	}
-
-	testGauge := prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "test_gauge",
-			Help: "This is a test gauge",
+func createTestMetricsFamily() []*io_prometheus_client.MetricFamily {
+	metric := []*io_prometheus_client.Metric{{
+		Label: []*io_prometheus_client.LabelPair{
+			//	{Name: proto.String("__name__"), Value: proto.String("test_gauge")},
+			{Name: proto.String("label1"), Value: proto.String("value1")},
 		},
-	)
-	testGauge.Set(1.0)
-	c.Collector.GetRegistry().MustRegister(testGauge)
+		Gauge: &io_prometheus_client.Gauge{
+			Value: proto.Float64(1.0),
+		},
+	}}
 
-	metrics, err := c.ExportMetrics()
-	if err != nil {
-		t.Fatalf("Failed to extract metrics: %v", err)
+	return []*io_prometheus_client.MetricFamily{{
+		Name:   proto.String("test_gauge"),
+		Help:   proto.String("This is a test gauge"),
+		Type:   io_prometheus_client.MetricType_GAUGE.Enum(),
+		Metric: metric,
+	}}
+}
+
+func createTestTimeSeries() []prompb.TimeSeries {
+	return []prompb.TimeSeries{
+		{
+			Labels: []prompb.Label{
+				{Name: "__name__", Value: "test_gauge"},
+				{Name: "label1", Value: "value1"},
+			},
+			Samples: []prompb.Sample{
+				{Value: 1.0, Timestamp: 1234567890},
+			},
+		},
 	}
+}
 
-	timeseries, err := ProcessMetrics(metrics, c.Logger)
+func TestMetricsProcessing(t *testing.T) {
+	logger := &logger.SlogLogger{}
+	logger.Init(types.Config{})
+
+	timeseries, err := ProcessMetrics(createTestMetricsFamily(), logger)
 	if err != nil {
 		t.Fatalf("Failed to process metrics: %v", err)
 	}
-
-	// Check if the timeseries are in the correct format
 
 	for _, ts := range timeseries {
 		if len(ts.Labels) == 0 {
@@ -105,48 +106,14 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &logger.SlogLogger{
-		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		})),
-	}
+	logger := &logger.SlogLogger{}
+	logger.Init(types.Config{})
 
-	promClient := &PromClient{
+	p := &PromClient{
 		RemoteWriteURL: svr.URL,
 	}
 
-	c := &controller.Controller{
-		Logger:     logger,
-		Collector:  &test_utils.YaceMockClient{},
-		YaceConfig: &yace.YaceOptions{},
-		Persister:  promClient,
-	}
-
-	err := c.Collector.Init(c.Config)
-	if err != nil {
-		t.Fatalf("Failed to initialize Collector: %v", err)
-	}
-
-	testGauge := prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "test_gauge",
-			Help: "This is a test gauge",
-		},
-	)
-	testGauge.Set(1.0)
-	c.Collector.GetRegistry().MustRegister(testGauge)
-
-	metrics, err := c.Collector.ExportMetrics(c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to extract metrics: %v", err)
-	}
-
-	timeseries, err := ProcessMetrics(metrics, c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to process metrics: %v", err)
-	}
-
-	err = c.Persister.PersistMetrics(timeseries, c.Logger)
+	err := p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
@@ -174,53 +141,17 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &logger.SlogLogger{
-		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		})),
-	}
+	logger := &logger.SlogLogger{}
+	logger.Init(types.Config{})
 
-	promClient := &PromClient{
+	p := &PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "BASIC",
 		Username:       "testuser",
 		Password:       "testpassword",
 	}
 
-	c := &controller.Controller{
-		Logger:     logger,
-		Collector:  &test_utils.YaceMockClient{},
-		YaceConfig: &yace.YaceOptions{},
-		Persister:  promClient,
-	}
-
-	err := c.Collector.Init(types.Config{
-		RemoteWriteURL: svr.URL,
-	})
-	if err != nil {
-		t.Fatalf("Failed to initialize Collector: %v", err)
-	}
-
-	testGauge := prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "test_gauge",
-			Help: "This is a test gauge",
-		},
-	)
-	testGauge.Set(1.0)
-	c.Collector.GetRegistry().MustRegister(testGauge)
-
-	metrics, err := c.Collector.ExportMetrics(c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to extract metrics: %v", err)
-	}
-
-	timeseries, err := ProcessMetrics(metrics, c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to process metrics: %v", err)
-	}
-
-	err = c.Persister.PersistMetrics(timeseries, c.Logger)
+	err := p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
@@ -244,55 +175,20 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 		}
 	}))
 
-	logger := &logger.SlogLogger{
-		Logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		})),
-	}
+	logger := &logger.SlogLogger{}
+	logger.Init(types.Config{})
 
-	promClient := &PromClient{
+	p := &PromClient{
 		RemoteWriteURL: svr.URL,
 		AuthType:       "TOKEN",
 		AuthToken:      "testtoken",
 	}
 
-	c := &controller.Controller{
-		Logger:     logger,
-		Collector:  &test_utils.YaceMockClient{},
-		YaceConfig: &yace.YaceOptions{},
-		Persister:  promClient,
-	}
-
-	err := c.Collector.Init(types.Config{
-		RemoteWriteURL: svr.URL,
-	})
-	if err != nil {
-		t.Fatalf("Failed to initialize Collector: %v", err)
-	}
-
-	testGauge := prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "test_gauge",
-			Help: "This is a test gauge",
-		},
-	)
-	testGauge.Set(1.0)
-	c.Collector.GetRegistry().MustRegister(testGauge)
-
-	metrics, err := c.Collector.ExportMetrics(c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to extract metrics: %v", err)
-	}
-
-	timeseries, err := ProcessMetrics(metrics, c.Logger)
-	if err != nil {
-		t.Fatalf("Failed to process metrics: %v", err)
-	}
-
-	err = c.Persister.PersistMetrics(timeseries, c.Logger)
+	err := p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
 
 	defer svr.Close()
+
 }

@@ -2,7 +2,10 @@
 package controller
 
 import (
+	"github.com/kjansson/yac-p/pkg/logger"
+	"github.com/kjansson/yac-p/pkg/prom"
 	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/pkg/yace"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )
@@ -13,6 +16,21 @@ type Controller struct {
 	Collector  types.MetricCollector
 	Persister  types.MetricPersister
 	Config     types.Config
+}
+
+func NewController(config types.Config) (*Controller, error) {
+	c := &Controller{
+		Config:     config,
+		Logger:     &logger.SlogLogger{},
+		Collector:  &yace.YaceClient{},
+		YaceConfig: &yace.YaceOptions{},
+		Persister:  &prom.PromClient{},
+	}
+	err := c.Init()
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 // Init initializes all components of the controller

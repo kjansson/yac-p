@@ -149,11 +149,11 @@ func ProcessMetrics(metrics []*io_prometheus_client.MetricFamily, logger types.L
 		for _, metric := range family.GetMetric() { // Range through the metrics of the metric type
 			ts := prompb.TimeSeries{}
 
+			// This one is special, we need to add the metric name in the special label that prometheus expects
+			ts.Labels = append(ts.Labels, prompb.Label{Name: "__name__", Value: metricName})
 			for _, label := range metric.GetLabel() {
 				ts.Labels = append(ts.Labels, prompb.Label{Name: label.GetName(), Value: label.GetValue()}) // Create prometheus time series labels
 			}
-			// This one is special, we need to add the metric name in the special label that prometheus expects
-			ts.Labels = append(ts.Labels, prompb.Label{Name: "__name__", Value: metricName})
 
 			value, err := getValue(metricType, metric) // Extract the value of the metric based on the metric type
 			if err != nil {
