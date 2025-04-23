@@ -40,10 +40,13 @@ func TestLogLevel(t *testing.T) {
 		}
 	}()
 
-	l.Init(types.Config{
+	err = l.Init(types.Config{
 		Debug:          false,
 		LogDestination: tmpFile,
 	})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	l.Log("debug", "test message", "key1", "value1")
 
@@ -81,11 +84,14 @@ func TestLogFormat(t *testing.T) {
 		}
 	}()
 
-	l.Init(types.Config{
+	err = l.Init(types.Config{
 		Debug:          false,
 		LogDestination: tmpFile,
 		LogFormat:      "json",
 	})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	l.Log("info", "test message", "key1", "value1")
 

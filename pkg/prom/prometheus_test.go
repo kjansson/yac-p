@@ -61,7 +61,10 @@ func createTestTimeSeries() []prompb.TimeSeries {
 
 func TestMetricsProcessing(t *testing.T) {
 	logger := &logger.SlogLogger{}
-	logger.Init(types.Config{})
+	err := logger.Init(types.Config{})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	timeseries, err := ProcessMetrics(createTestMetricsFamily(), logger)
 	if err != nil {
@@ -107,13 +110,16 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 	}))
 
 	logger := &logger.SlogLogger{}
-	logger.Init(types.Config{})
+	err := logger.Init(types.Config{})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	p := &PromClient{
 		RemoteWriteURL: svr.URL,
 	}
 
-	err := p.PersistMetrics(createTestTimeSeries(), logger)
+	err = p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
@@ -142,7 +148,10 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 	}))
 
 	logger := &logger.SlogLogger{}
-	logger.Init(types.Config{})
+	err := logger.Init(types.Config{})
+	if err != nil {
+		t.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	p := &PromClient{
 		RemoteWriteURL: svr.URL,
@@ -151,7 +160,7 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 		Password:       "testpassword",
 	}
 
-	err := p.PersistMetrics(createTestTimeSeries(), logger)
+	err = p.PersistMetrics(createTestTimeSeries(), logger)
 	if err != nil {
 		t.Fatalf("Failed to persist metrics: %v", err)
 	}
