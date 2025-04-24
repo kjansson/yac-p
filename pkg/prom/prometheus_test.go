@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kjansson/yac-p/pkg/logger"
-	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/v2/pkg/logger"
+	"github.com/kjansson/yac-p/v2/pkg/types"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 	"google.golang.org/protobuf/proto"

@@ -3,8 +3,8 @@ package controller
 import (
 	"testing"
 
-	"github.com/kjansson/yac-p/internal/test_utils"
-	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/v2/internal/test_utils"
+	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 func TestConfigLoad(t *testing.T) {
