@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 type SlogLogger struct {

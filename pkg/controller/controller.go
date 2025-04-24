@@ -2,10 +2,10 @@
 package controller
 
 import (
-	"github.com/kjansson/yac-p/pkg/logger"
-	"github.com/kjansson/yac-p/pkg/prom"
-	"github.com/kjansson/yac-p/pkg/types"
-	"github.com/kjansson/yac-p/pkg/yace"
+	"github.com/kjansson/yac-p/v2/pkg/logger"
+	"github.com/kjansson/yac-p/v2/pkg/prom"
+	"github.com/kjansson/yac-p/v2/pkg/types"
+	"github.com/kjansson/yac-p/v2/pkg/yace"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )

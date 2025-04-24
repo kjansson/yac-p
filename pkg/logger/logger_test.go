@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 // {"time":"2025-04-23T16:53:55.002724+02:00","level":"INFO","msg":"test message","key1":"value1"}

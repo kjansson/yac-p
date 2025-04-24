@@ -6,9 +6,9 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/kjansson/defcon"
-	"github.com/kjansson/yac-p/pkg/controller"
-	"github.com/kjansson/yac-p/pkg/prom"
-	"github.com/kjansson/yac-p/pkg/types"
+	"github.com/kjansson/yac-p/v2/pkg/controller"
+	"github.com/kjansson/yac-p/v2/pkg/prom"
+	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 func main() {
