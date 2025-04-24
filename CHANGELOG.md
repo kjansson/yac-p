@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/kjansson/yac-p/compare/v2.0.0...v3.0.0) (2025-04-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* Moves all env var configuration out of packages, config now part of types
+
+### Features
+
+* move to v2 ([#39](https://github.com/kjansson/yac-p/issues/39)) ([cae726d](https://github.com/kjansson/yac-p/commit/cae726d60e5722f3236c841b7d157a1dc11b9aae))
+
 ## [2.0.0](https://github.com/kjansson/yac-p/compare/v1.0.0...v2.0.0) (2025-04-23)
 
 
