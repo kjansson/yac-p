@@ -4,11 +4,11 @@ package main
 import (
 	"os"
 
-	"github.com/kjansson/yac-p/v2/pkg/collector/yace"
-	"github.com/kjansson/yac-p/v2/pkg/converter"
-	"github.com/kjansson/yac-p/v2/pkg/logger"
-	"github.com/kjansson/yac-p/v2/pkg/persister/prom"
-	"github.com/kjansson/yac-p/v2/pkg/types"
+	"github.com/kjansson/yac-p/v3/pkg/collector/yace"
+	"github.com/kjansson/yac-p/v3/pkg/converter"
+	"github.com/kjansson/yac-p/v3/pkg/logger"
+	"github.com/kjansson/yac-p/v3/pkg/persister/prom"
+	"github.com/kjansson/yac-p/v3/pkg/types"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 )

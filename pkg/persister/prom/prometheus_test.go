@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kjansson/yac-p/v2/pkg/logger"
+	"github.com/kjansson/yac-p/v3/pkg/logger"
 	"github.com/prometheus/prometheus/prompb"
 )
 

@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/kjansson/yac-p/v2/pkg/types"
+	"github.com/kjansson/yac-p/v3/pkg/types"
 	yace "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg"
 	client "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/clients/v2"
 	yace_config "github.com/prometheus-community/yet-another-cloudwatch-exporter/pkg/config"

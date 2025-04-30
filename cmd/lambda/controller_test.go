@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/kjansson/yac-p/v2/internal/test_utils"
+	"github.com/kjansson/yac-p/v3/internal/test_utils"
 )
 
 func TestConfigLoad(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/kjansson/yac-p/v2/pkg/types"
+	"github.com/kjansson/yac-p/v3/pkg/types"
 	"github.com/prometheus/prometheus/prompb"
 
 	io_prometheus_client "github.com/prometheus/client_model/go"

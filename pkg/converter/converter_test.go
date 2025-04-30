@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kjansson/yac-p/v2/pkg/logger"
+	"github.com/kjansson/yac-p/v3/pkg/logger"
 	"google.golang.org/protobuf/proto"
 
 	io_prometheus_client "github.com/prometheus/client_model/go"

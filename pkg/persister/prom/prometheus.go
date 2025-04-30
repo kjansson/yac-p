@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/golang/snappy"
-	"github.com/kjansson/yac-p/v2/pkg/types"
+	"github.com/kjansson/yac-p/v3/pkg/types"
 	"github.com/prometheus/prometheus/prompb"
 )
 

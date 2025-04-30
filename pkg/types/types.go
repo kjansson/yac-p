@@ -7,7 +7,6 @@ import (
 )
 
 type Logger interface {
-	//NewLogger() (*Logger, error)
 	Log(level string, msg string, args ...any)
 }
 
