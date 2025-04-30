@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/kjansson/yac-p/compare/v3.0.0...v3.0.1) (2025-04-30)
+
+
+### Bug Fixes
+
+* comments for correct package docs ([#50](https://github.com/kjansson/yac-p/issues/50)) ([1e9ad7b](https://github.com/kjansson/yac-p/commit/1e9ad7bd0596d389bb3fd0c4f0c4ac32c8c7a05d))
+
 ## [3.0.0](https://github.com/kjansson/yac-p/compare/v2.0.0...v3.0.0) (2025-04-30)
 
 
