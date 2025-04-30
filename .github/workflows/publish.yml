@@ -10,4 +10,4 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2.3.4
       - name: Publish Go package
-        run: curl "https://proxy.golang.org/github.com/kjansson/yac-p/v2/@v/$(git describe HEAD --tags --abbrev=0).info"
+        run: curl "https://proxy.golang.org/github.com/kjansson/yac-p/v3/@v/$(git describe HEAD --tags --abbrev=0).info"
