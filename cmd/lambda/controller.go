@@ -46,16 +46,16 @@ func NewController(config Config) (*Controller, error) {
 
 	converter := converter.NewConverter(logger)
 
-	persister := &prom.PromClient{
-		RemoteWriteURL:   config.RemoteWriteURL,
-		AuthType:         config.AuthType,
-		AuthToken:        config.AuthToken,
-		Username:         config.Username,
-		Password:         config.Password,
-		Region:           config.Region,
-		PrometheusRegion: config.PrometheusRegion,
-		AWSRoleARN:       config.AWSRoleARN,
-	}
+	persister := prom.NewPersister(
+		config.RemoteWriteURL,
+		config.AuthType,
+		config.AuthToken,
+		config.Username,
+		config.Password,
+		config.Region,
+		config.PrometheusRegion,
+		config.AWSRoleARN,
+	)
 
 	c := &Controller{
 		Logger:    logger,
