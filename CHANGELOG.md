@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/kjansson/yac-p/compare/v2.0.0...v2.1.0) (2025-04-30)
+
+
+### Features
+
+* remove inter-dependencies ([#44](https://github.com/kjansson/yac-p/issues/44)) ([02ef8af](https://github.com/kjansson/yac-p/commit/02ef8afaacaef69233f0da52dc957eae883c0eb6))
+
 ## [2.0.0](https://github.com/kjansson/yac-p/compare/v1.0.0...v2.0.0) (2025-04-23)
 
 
