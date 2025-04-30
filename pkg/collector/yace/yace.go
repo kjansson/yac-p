@@ -29,23 +29,14 @@ type YaceOpts struct {
 }
 
 type YaceClient struct {
-	Registry  *prometheus.Registry
-	Client    *client.CachingFactory
-	JobConfig model.JobsConfig
-	Logger    *slog.Logger
-	// YaceCloudwatchConcurrencyPerApiLimitEnabled       string
-	// YaceCloudwatchConcurrencyListMetricsLimit         string
-	// YaceCloudwatchConcurrencyGetMetricDataLimit       string
-	// YaceCloudwatchConcurrencyGetMetricStatisticsLimit string
-	// YaceMetricsPerQuery                               string
-	// YaceTaggingAPIConcurrency                         string
-	// YaceCloudwatchConcurrency                         string
+	Registry         *prometheus.Registry
+	Client           *client.CachingFactory
+	JobConfig        model.JobsConfig
+	Logger           *slog.Logger
 	YaceOpts         YaceOpts
 	ConfigFileLoader func() ([]byte, error)
 }
 
-// Init initializes the YACE client
-// It expects a function for loading the yace configuration file
 func NewYaceClient(
 	configFileLoader func() ([]byte, error),
 	yaceOpts YaceOpts,
@@ -101,8 +92,6 @@ func NewYaceClient(
 			return nil, err
 		}
 	}
-
-	//y.Config = getYaceOptions(config, y.Logger)
 
 	y.Client, err = client.NewFactory(y.Logger, y.JobConfig, false)
 	if err != nil {
