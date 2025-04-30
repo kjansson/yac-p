@@ -1,5 +1,4 @@
-// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages for collecting metrics from AWS Cloudwatch as well as managing
-// It implements the types.MetricCollector interface.
+// Package yace provides a client for the Yet Another Cloudwatch Exporter (YACE) packages for collecting metrics from AWS Cloudwatch as well as managing. Implements the types.MetricCollector interface.
 package yace
 
 import (
@@ -18,6 +17,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// YaceOpts contains the options that are normally passed to YACE via command line arguments, for more information (https://github.com/prometheus-community/yet-another-cloudwatch-exporter/blob/master/docs/configuration.md#command-line-flags).
 type YaceOpts struct {
 	YaceCloudwatchConcurrencyPerApiLimitEnabled       string
 	YaceCloudwatchConcurrencyListMetricsLimit         string
@@ -29,18 +29,15 @@ type YaceOpts struct {
 }
 
 type YaceClient struct {
-	Registry         *prometheus.Registry
-	Client           *client.CachingFactory
-	JobConfig        model.JobsConfig
-	Logger           *slog.Logger
-	YaceOpts         YaceOpts
-	ConfigFileLoader func() ([]byte, error)
+	Registry         *prometheus.Registry   // Prometheus registry used to store the metrics
+	Client           *client.CachingFactory // YACE client used to collect metrics
+	JobConfig        model.JobsConfig       // YACE job config
+	Logger           *slog.Logger           // Logger instance
+	YaceOpts         YaceOpts               // YACE options
+	ConfigFileLoader func() ([]byte, error) // Function to load the YACE config file
 }
 
-func NewYaceClient(
-	configFileLoader func() ([]byte, error),
-	yaceOpts YaceOpts,
-) (*YaceClient, error) {
+func NewYaceClient(configFileLoader func() ([]byte, error), yaceOpts YaceOpts) (*YaceClient, error) {
 	var err error
 
 	y := &YaceClient{

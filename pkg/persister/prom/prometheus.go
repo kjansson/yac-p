@@ -1,5 +1,4 @@
-// Package prom provides a client for processing and persisting metrics to a Prometheus remote write endpoint.
-// It implements the types.MetricPersister interface.
+// Package prom provides a client for persisting metrics to a Prometheus remote write endpoint. It implements the types.MetricPersister interface.
 package prom
 
 import (
@@ -21,14 +20,14 @@ import (
 )
 
 type PromClient struct {
-	RemoteWriteURL   string // The URL of the Prometheus remote write endpoint
-	AuthType         string // The type of authentication to use (AWS, BASIC, TOKEN)
-	AuthToken        string // The token to use for authentication (if using TOKEN auth)
-	Username         string // The username to use for authentication (if using BASIC auth)
-	Password         string // The password to use for authentication (if using BASIC auth)
-	Region           string // The AWS region to use for authentication (if using AWS auth)
-	PrometheusRegion string // The AWS region of the Prometheus remote write endpoint (if using Amazon Managed Prometheus)
-	AWSRoleARN       string // The ARN of the AWS role to assume for remote write (if using Amazon Managed Prometheus cross-account)
+	RemoteWriteURL   string // URL of the Prometheus remote write endpoint
+	AuthType         string // Type of authentication to use (AWS, BASIC, TOKEN)
+	AuthToken        string // Token to use for authentication (if using TOKEN auth)
+	Username         string // Username to use for authentication (if using BASIC auth)
+	Password         string // Password to use for authentication (if using BASIC auth)
+	Region           string // AWS region to use for authentication (if using AWS auth)
+	PrometheusRegion string // AWS region of the Prometheus remote write endpoint (if using Amazon Managed Prometheus)
+	AWSRoleARN       string // ARN of the AWS role to assume for remote write (if using Amazon Managed Prometheus cross-account)
 }
 
 func NewPromClient(

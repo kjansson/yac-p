@@ -1,5 +1,4 @@
-// Package logger provides a simple logging interface for yac-p
-// It implements the types.Logger interface
+// Package logger provides a simple logging interface for yac-p. Implements the types.Logger interface.
 package logger
 
 import (
@@ -8,10 +7,10 @@ import (
 )
 
 type SlogLogger struct {
-	Logger         *slog.Logger
-	LogFormat      string
-	LogDestination *os.File
-	LogLevel       string
+	Logger         *slog.Logger // slog logger instance
+	LogFormat      string       // Format of the log output (json or text)
+	LogDestination *os.File     // Destination of the log output
+	LogLevel       string       // Logging level (debug, info, warn, error)
 }
 
 // Init initializes the logger and determines the log level
