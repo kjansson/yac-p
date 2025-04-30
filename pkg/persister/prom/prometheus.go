@@ -31,7 +31,7 @@ type PromClient struct {
 	AWSRoleARN       string // The ARN of the AWS role to assume for remote write (if using Amazon Managed Prometheus cross-account)
 }
 
-func NewPersister(
+func NewPromClient(
 	remoteWriteURL string,
 	authType string,
 	authToken string,

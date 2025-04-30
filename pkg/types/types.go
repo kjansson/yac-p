@@ -24,3 +24,42 @@ type MetricConverter interface {
 type MetricPersister interface {
 	PersistMetrics([]prompb.TimeSeries, Logger) error
 }
+
+type Controller struct {
+	Logger    Logger
+	Collector MetricCollector
+	Converter MetricConverter
+	Persister MetricPersister
+}
+
+// Log extends the logger interface
+func (c *Controller) Log(level string, msg string, args ...any) {
+	c.Logger.Log(level, msg, args...)
+}
+
+// GetRegistry returns the prometheus registry from the Collector component
+func (c *Controller) CollectMetrics() error {
+	return c.Collector.CollectMetrics(c.Logger)
+}
+
+// GetRegistry extracts the metrics from the prometheus registry in the Collector component
+func (c *Controller) ExportMetrics() ([]*io_prometheus_client.MetricFamily, error) {
+	metrics, err := c.Collector.ExportMetrics(c.Logger)
+	if err != nil {
+		return nil, err
+	}
+	return metrics, nil
+}
+
+// PersistMetrics extends the underlying method and persists timeseries to the remote write endpoint
+func (c *Controller) PersistMetrics(timeSeries []prompb.TimeSeries) error {
+	return c.Persister.PersistMetrics(timeSeries, c.Logger)
+}
+
+func (c *Controller) ConvertMetrics(metrics []*io_prometheus_client.MetricFamily) ([]prompb.TimeSeries, error) {
+	timeSeries, err := c.Converter.ConvertMetrics(metrics, c.Logger)
+	if err != nil {
+		return nil, err
+	}
+	return timeSeries, nil
+}

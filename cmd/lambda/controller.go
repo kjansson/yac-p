@@ -9,19 +9,9 @@ import (
 	"github.com/kjansson/yac-p/v3/pkg/logger"
 	"github.com/kjansson/yac-p/v3/pkg/persister/prom"
 	"github.com/kjansson/yac-p/v3/pkg/types"
-	io_prometheus_client "github.com/prometheus/client_model/go"
-	"github.com/prometheus/prometheus/prompb"
 )
 
-type Controller struct {
-	Logger    types.Logger
-	Collector types.MetricCollector
-	Converter types.MetricConverter
-	Persister types.MetricPersister
-	Config    Config
-}
-
-func NewController(config Config) (*Controller, error) {
+func NewController(config Config) (*types.Controller, error) {
 
 	logger, err := logger.NewLogger(config.LogDestination, config.LogFormat, config.Debug)
 	if err != nil {
@@ -46,7 +36,7 @@ func NewController(config Config) (*Controller, error) {
 
 	converter := converter.NewConverter(logger)
 
-	persister := prom.NewPersister(
+	persister := prom.NewPromClient(
 		config.RemoteWriteURL,
 		config.AuthType,
 		config.AuthToken,
@@ -57,7 +47,7 @@ func NewController(config Config) (*Controller, error) {
 		config.AWSRoleARN,
 	)
 
-	c := &Controller{
+	c := &types.Controller{
 		Logger:    logger,
 		Collector: collector,
 		Converter: converter,
@@ -65,38 +55,6 @@ func NewController(config Config) (*Controller, error) {
 	}
 
 	return c, nil
-}
-
-// Log extends the logger interface
-func (c *Controller) Log(level string, msg string, args ...any) {
-	c.Logger.Log(level, msg, args...)
-}
-
-// GetRegistry returns the prometheus registry from the Collector component
-func (c *Controller) CollectMetrics() error {
-	return c.Collector.CollectMetrics(c.Logger)
-}
-
-// GetRegistry extracts the metrics from the prometheus registry in the Collector component
-func (c *Controller) ExportMetrics() ([]*io_prometheus_client.MetricFamily, error) {
-	metrics, err := c.Collector.ExportMetrics(c.Logger)
-	if err != nil {
-		return nil, err
-	}
-	return metrics, nil
-}
-
-// PersistMetrics extends the underlying method and persists timeseries to the remote write endpoint
-func (c *Controller) PersistMetrics(timeSeries []prompb.TimeSeries) error {
-	return c.Persister.PersistMetrics(timeSeries, c.Logger)
-}
-
-func (c *Controller) ConvertMetrics(metrics []*io_prometheus_client.MetricFamily) ([]prompb.TimeSeries, error) {
-	timeSeries, err := c.Converter.ConvertMetrics(metrics, c.Logger)
-	if err != nil {
-		return nil, err
-	}
-	return timeSeries, nil
 }
 
 type Config struct {
