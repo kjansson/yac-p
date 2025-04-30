@@ -1,3 +1,4 @@
+// Package converter provides methods to convert metrics to timeseries format for Prometheus remote write. It implements the types.MetricConverter interface.
 package converter
 
 import (
@@ -12,7 +13,7 @@ import (
 )
 
 type Converter struct {
-	Logger types.Logger
+	Logger types.Logger // Logger instance
 }
 
 func NewConverter(logger types.Logger) *Converter {
@@ -33,7 +34,7 @@ func getValue(valueType io_prometheus_client.MetricType, metric *io_prometheus_c
 	}
 }
 
-// ProcessMetrics accepts Prometheus metrics gathered from a Prometheus registry, converts and returns them in timeseries format suitable for the Prometheus remote write API
+// ConvertMetrics accepts Prometheus metrics gathered from a Prometheus registry, converts and returns them in timeseries format suitable for the Prometheus remote write API
 func (c *Converter) ConvertMetrics(metrics []*io_prometheus_client.MetricFamily, logger types.Logger) ([]prompb.TimeSeries, error) {
 
 	newTimestamp := time.Now().UnixNano() / int64(time.Millisecond)

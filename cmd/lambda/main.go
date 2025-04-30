@@ -1,3 +1,4 @@
+// Lambda implementation of yac-p
 package main
 
 import (
