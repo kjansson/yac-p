@@ -53,5 +53,5 @@ Each flag controlling concurrency has a corresponding environment variable, in s
 Example: the flag "cloudwatch-concurrency" can be controlled through ```YACE_CLOUDWATCH_CONCURRENCY```.
 
 ## Customization
-Go packages are available (https://pkg.go.dev/github.com/kjansson/yac-p) and can be used for custom applications.
+Go packages are available (https://pkg.go.dev/github.com/kjansson/yac-p/v3) and can be used for custom applications.
 The code included in ```cmd``` is for the Lambda implementation and config file storage in S3, but can easily be adapted using custom config file loaders.
