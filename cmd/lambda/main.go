@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
-	//"github.com/kjansson/yac-p/v2/pkg/controller"
 	defcon "github.com/kjansson/defcon"
 )
 
@@ -12,17 +11,6 @@ func main() {
 
 func HandleRequest() {
 
-	// config := Config{
-	// 	ConfigFileLoader: GetS3Loader(), // Use the S3 loader for Lambda implementation
-	// 	RemoteWriteURL:   os.Getenv("PROMETHEUS_REMOTE_WRITE_URL"),
-	// 	AuthType:         os.Getenv("AUTH_TYPE"),
-	// 	AuthToken:        os.Getenv("TOKEN"),
-	// 	Username:         os.Getenv("USERNAME"),
-	// 	Password:         os.Getenv("PASSWORD"),
-	// 	Region:           os.Getenv("AWS_REGION"),
-	// 	PrometheusRegion: os.Getenv("PROMETHEUS_REGION"),
-	// 	AWSRoleARN:       os.Getenv("AWS_ROLE_ARN"),
-	// }
 	config := Config{}
 	err := defcon.CheckConfigStruct(&config) // Validate the config struct
 	if err != nil {
