@@ -32,7 +32,6 @@ func createTestMetricsFamily() []*io_prometheus_client.MetricFamily {
 func TestMetricsProcessing(t *testing.T) {
 	logger, err := logger.NewLogger(
 		os.Stdout,
-		"debug",
 		"text",
 		false,
 	)

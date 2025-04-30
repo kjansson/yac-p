@@ -55,7 +55,6 @@ func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	logger, err := logger.NewLogger(
 		os.Stdout,
-		"debug",
 		"text",
 		false,
 	)
@@ -97,7 +96,6 @@ func TestMetricsPersistingBasicAuth(t *testing.T) {
 
 	logger, err := logger.NewLogger(
 		os.Stdout,
-		"debug",
 		"text",
 		false,
 	)
@@ -138,7 +136,6 @@ func TestMetricsPersistingTokenAuth(t *testing.T) {
 
 	logger, err := logger.NewLogger(
 		os.Stdout,
-		"debug",
 		"text",
 		false,
 	)

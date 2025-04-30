@@ -23,7 +23,7 @@ type Controller struct {
 
 func NewController(config Config) (*Controller, error) {
 
-	logger, err := logger.NewLogger(config.LogDestination, config.LogLevel, config.LogFormat, config.Debug)
+	logger, err := logger.NewLogger(config.LogDestination, config.LogFormat, config.Debug)
 	if err != nil {
 		return nil, err
 	}
@@ -100,24 +100,24 @@ func (c *Controller) ConvertMetrics(metrics []*io_prometheus_client.MetricFamily
 }
 
 type Config struct {
-	Debug                                             bool
-	RemoteWriteURL                                    string
-	AuthType                                          string
-	AuthToken                                         string
-	Username                                          string
-	Password                                          string
-	Region                                            string
-	PrometheusRegion                                  string
-	AWSRoleARN                                        string
-	YaceCloudwatchConcurrencyPerApiLimitEnabled       string
-	YaceCloudwatchConcurrencyListMetricsLimit         string
-	YaceCloudwatchConcurrencyGetMetricDataLimit       string
-	YaceCloudwatchConcurrencyGetMetricStatisticsLimit string
-	YaceMetricsPerQuery                               string
-	YaceTaggingAPIConcurrency                         string
-	YaceCloudwatchConcurrency                         string
+	Debug                                             bool   `env:"DEBUG"`
+	RemoteWriteURL                                    string `env:"PROMETHEUS_REMOTE_WRITE_URL"`
+	AuthType                                          string `env:"AUTH_TYPE"`
+	AuthToken                                         string `env:"AUTH_TYPE"`
+	Username                                          string `env:"USERNAME"`
+	Password                                          string `env:"PASSWORD"`
+	Region                                            string `env:"AWS_REGION"`
+	PrometheusRegion                                  string `env:"PROMETHEUS_REGION"`
+	AWSRoleARN                                        string `env:"AWS_ROLE_ARN"`
+	YaceCloudwatchConcurrencyPerApiLimitEnabled       string `env:"YACE_CLOUDWATCH_CONCURRENCY_PER_API_LIMIT_ENABLED"`
+	YaceCloudwatchConcurrencyListMetricsLimit         string `env:"YACE_CLOUDWATCH_CONCURRENCY_LIST_METRICS_LIMIT"`
+	YaceCloudwatchConcurrencyGetMetricDataLimit       string `env:"YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_DATA_LIMIT"`
+	YaceCloudwatchConcurrencyGetMetricStatisticsLimit string `env:"YACE_CLOUDWATCH_CONCURRENCY_GET_METRIC_STATISTICS_LIMIT"`
+	YaceMetricsPerQuery                               string `env:"YACE_METRICS_PER_QUERY"`
+	YaceTaggingAPIConcurrency                         string `env:"YACE_TAGGING_API_CONCURRENCY"`
+	YaceCloudwatchConcurrency                         string `env:"YACE_CLOUDWATCH_CONCURRENCY"`
 	ConfigFileLoader                                  func() ([]byte, error)
-	LogFormat                                         string
-	LogLevel                                          string
+	LogFormat                                         string `env:"LOG_FORMAT"`
+	LogLevel                                          string `env:"LOG_LEVEL"`
 	LogDestination                                    *os.File
 }

@@ -17,7 +17,7 @@ type TestLogEntry struct {
 
 func TestLogLevel(t *testing.T) {
 
-	l, err := NewLogger(os.Stdout, "info", "json", false)
+	l, err := NewLogger(os.Stdout, "json", false)
 	if err != nil {
 		t.Fatalf("Failed to create logger: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestLogFormat(t *testing.T) {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}
 
-	l, err := NewLogger(tmpFile, "debug", "json", false)
+	l, err := NewLogger(tmpFile, "json", false)
 	if err != nil {
 		t.Fatalf("Failed to create logger: %v", err)
 	}

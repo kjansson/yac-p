@@ -15,7 +15,7 @@ type SlogLogger struct {
 }
 
 // Init initializes the logger and determines the log level
-func NewLogger(LogDestination *os.File, LogLevel string, LogFormat string, Debug bool) (*SlogLogger, error) {
+func NewLogger(LogDestination *os.File, LogFormat string, Debug bool) (*SlogLogger, error) {
 
 	logger := &SlogLogger{}
 	logOpts := &slog.HandlerOptions{}
