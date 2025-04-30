@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.0](https://github.com/kjansson/yac-p/compare/v2.0.0...v3.0.0) (2025-04-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* new interface to interact with controller and all components
+
+### Features
+
+* remove inter-dependencies ([#44](https://github.com/kjansson/yac-p/issues/44)) ([02ef8af](https://github.com/kjansson/yac-p/commit/02ef8afaacaef69233f0da52dc957eae883c0eb6))
+* remove yace hard dependencies ([#48](https://github.com/kjansson/yac-p/issues/48)) ([c0c9bf5](https://github.com/kjansson/yac-p/commit/c0c9bf55a33683791ca029352e94ed0d7b4bca72))
+
 ## [2.0.0](https://github.com/kjansson/yac-p/compare/v1.0.0...v2.0.0) (2025-04-23)
 
 
