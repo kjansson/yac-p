@@ -5,37 +5,39 @@ package logger
 import (
 	"log/slog"
 	"os"
-
-	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 type SlogLogger struct {
-	Logger *slog.Logger
+	Logger         *slog.Logger
+	LogFormat      string
+	LogDestination *os.File
+	LogLevel       string
 }
 
 // Init initializes the logger and determines the log level
-func (l *SlogLogger) Init(config types.Config) error {
+func NewLogger(LogDestination *os.File, LogLevel string, LogFormat string, Debug bool) (*SlogLogger, error) {
 
+	logger := &SlogLogger{}
 	logOpts := &slog.HandlerOptions{}
-	if config.Debug {
+	if Debug {
 		logOpts.Level = slog.LevelDebug
 	} else {
 		logOpts.Level = slog.LevelInfo
 	}
 
 	var destination *os.File
-	if config.LogDestination != nil {
-		destination = config.LogDestination
+	if LogDestination != nil {
+		destination = LogDestination
 	} else {
 		destination = os.Stdout
 	}
 
-	if config.LogFormat == "json" || config.LogFormat == "JSON" {
-		l.Logger = slog.New(slog.NewJSONHandler(destination, logOpts))
+	if LogFormat == "json" || LogFormat == "JSON" {
+		logger.Logger = slog.New(slog.NewJSONHandler(destination, logOpts))
 	} else {
-		l.Logger = slog.New(slog.NewTextHandler(destination, logOpts))
+		logger.Logger = slog.New(slog.NewTextHandler(destination, logOpts))
 	}
-	return nil
+	return logger, nil
 }
 
 // Log accepts generic log entry components uses the slog package to log messages
