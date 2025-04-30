@@ -5,8 +5,6 @@ import (
 	"io"
 	"os"
 	"testing"
-
-	"github.com/kjansson/yac-p/v2/pkg/types"
 )
 
 // {"time":"2025-04-23T16:53:55.002724+02:00","level":"INFO","msg":"test message","key1":"value1"}
@@ -19,7 +17,10 @@ type TestLogEntry struct {
 
 func TestLogLevel(t *testing.T) {
 
-	l := &SlogLogger{}
+	l, err := NewLogger(os.Stdout, "json", false)
+	if err != nil {
+		t.Fatalf("Failed to create logger: %v", err)
+	}
 
 	tmpFile, err := os.CreateTemp(".", "logtest")
 	if err != nil {
@@ -39,14 +40,6 @@ func TestLogLevel(t *testing.T) {
 			t.Fatalf("Failed to close temp file: %v", err)
 		}
 	}()
-
-	err = l.Init(types.Config{
-		Debug:          false,
-		LogDestination: tmpFile,
-	})
-	if err != nil {
-		t.Fatalf("Failed to initialize logger: %v", err)
-	}
 
 	l.Log("debug", "test message", "key1", "value1")
 
@@ -63,11 +56,14 @@ func TestLogLevel(t *testing.T) {
 
 func TestLogFormat(t *testing.T) {
 
-	l := &SlogLogger{}
-
 	tmpFile, err := os.CreateTemp(".", "logtest")
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
+	}
+
+	l, err := NewLogger(tmpFile, "json", false)
+	if err != nil {
+		t.Fatalf("Failed to create logger: %v", err)
 	}
 
 	defer func() {
@@ -83,15 +79,6 @@ func TestLogFormat(t *testing.T) {
 			t.Fatalf("Failed to close temp file: %v", err)
 		}
 	}()
-
-	err = l.Init(types.Config{
-		Debug:          false,
-		LogDestination: tmpFile,
-		LogFormat:      "json",
-	})
-	if err != nil {
-		t.Fatalf("Failed to initialize logger: %v", err)
-	}
 
 	l.Log("info", "test message", "key1", "value1")
 
