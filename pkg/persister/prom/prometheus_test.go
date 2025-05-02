@@ -38,6 +38,52 @@ func createTestTimeSeries() []prompb.TimeSeries {
 	}
 }
 
+func TestAuthOptions(t *testing.T) {
+
+	_, err := NewPromClient(
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+	)
+	if err == nil {
+		t.Fatalf("Expected error for empty Prometheus URL, got nil")
+	}
+
+	_, err = NewPromClient(
+		"http://localhost:9090/api/v1/write",
+		"BASIC",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+	)
+	if err == nil {
+		t.Fatalf("Expected error for empty basic auth credentials, got nil")
+	}
+
+	_, err = NewPromClient(
+		"http://localhost:9090/api/v1/write",
+		"TOKEN",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+	)
+	if err == nil {
+		t.Fatalf("Expected error for empty token auth credentials, got nil")
+	}
+
+}
+
 func TestMetricsPersistingNoAuth(t *testing.T) {
 
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
