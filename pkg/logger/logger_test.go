@@ -95,3 +95,11 @@ func TestLogFormat(t *testing.T) {
 		t.Fatalf("Expected JSON format, got '%s'", string(entry[:n]))
 	}
 }
+
+func TestLogFormatInit(t *testing.T) {
+
+	_, err := NewLogger(os.Stdout, "wrongformat", false)
+	if err == nil {
+		t.Fatalf("Expected error for invalid log format, got nil")
+	}
+}

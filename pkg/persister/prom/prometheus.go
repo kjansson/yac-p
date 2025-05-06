@@ -39,7 +39,23 @@ func NewPromClient(
 	region string,
 	prometheusRegion string,
 	awsRoleARN string,
-) *PromClient {
+) (*PromClient, error) {
+
+	if remoteWriteURL == "" {
+		return nil, fmt.Errorf("prometheus remote write URL must be set")
+	}
+
+	if authType == "BASIC" { // Basic auth requires username and password
+		if username == "" || password == "" {
+			return nil, fmt.Errorf("username and password must be set for BASIC auth")
+		}
+	}
+	if authType == "TOKEN" { // Token auth requires token
+		if authToken == "" {
+			return nil, fmt.Errorf("auth token must be set for TOKEN auth")
+		}
+	}
+
 	return &PromClient{
 		RemoteWriteURL:   remoteWriteURL,
 		AuthType:         authType,
@@ -49,7 +65,7 @@ func NewPromClient(
 		Region:           region,
 		PrometheusRegion: prometheusRegion,
 		AWSRoleARN:       awsRoleARN,
-	}
+	}, nil
 }
 
 // PeristMetrics creates a Prometheus remote write request and sends it to the remote write URL

@@ -1,4 +1,3 @@
-// Package controller provides the yac-p controller struct and its methods to manage the components of the application
 package main
 
 import (
@@ -36,7 +35,7 @@ func NewController(config Config) (*types.Controller, error) {
 
 	converter := converter.NewConverter(logger)
 
-	persister := prom.NewPromClient(
+	persister, err := prom.NewPromClient(
 		config.RemoteWriteURL,
 		config.AuthType,
 		config.AuthToken,
@@ -46,6 +45,9 @@ func NewController(config Config) (*types.Controller, error) {
 		config.PrometheusRegion,
 		config.AWSRoleARN,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	c := &types.Controller{
 		Logger:    logger,

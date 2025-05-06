@@ -2,6 +2,7 @@
 package logger
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 )
@@ -29,6 +30,12 @@ func NewLogger(LogDestination *os.File, LogFormat string, Debug bool) (*SlogLogg
 		destination = LogDestination
 	} else {
 		destination = os.Stdout
+	}
+
+	if LogFormat != "" {
+		if LogFormat != "json" && LogFormat != "JSON" && LogFormat != "text" && LogFormat != "TEXT" {
+			return nil, fmt.Errorf("invalid log format: %s", LogFormat)
+		}
 	}
 
 	if LogFormat == "json" || LogFormat == "JSON" {
