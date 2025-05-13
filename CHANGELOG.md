@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/kjansson/yac-p/compare/v3.0.1...v3.1.0) (2025-05-13)
+
+
+### Features
+
+* error checks ([#53](https://github.com/kjansson/yac-p/issues/53)) ([c8e9095](https://github.com/kjansson/yac-p/commit/c8e9095d324abfb38bba400f0bd136df9a0896d9))
+
 ## [3.0.1](https://github.com/kjansson/yac-p/compare/v3.0.0...v3.0.1) (2025-04-30)
 
 
