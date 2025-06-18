@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/kjansson/yac-p/compare/v3.1.0...v3.1.1) (2025-06-18)
+
+
+### Bug Fixes
+
+* update release-please config to trigger patch release on deps update ([#56](https://github.com/kjansson/yac-p/issues/56)) ([391c5e5](https://github.com/kjansson/yac-p/commit/391c5e5e0bdec68e07c45f4a8eb927c2c39c056a))
+
 ## [3.1.0](https://github.com/kjansson/yac-p/compare/v3.0.1...v3.1.0) (2025-05-13)
 
 
