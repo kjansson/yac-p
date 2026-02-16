@@ -16,8 +16,7 @@ import (
 
 // GetS3Loader returns a function that loads the config from S3
 func GetS3Loader() func() ([]byte, error) {
-	return func() ([]byte, error) {
-		var content []byte
+	return func() (content []byte, err error) {
 		configS3Path, configS3Bucket := os.Getenv("CONFIG_S3_PATH"), os.Getenv("CONFIG_S3_BUCKET")
 		if configS3Bucket != "" && configS3Path != "" {
 			ctx := context.TODO()
@@ -41,7 +40,11 @@ func GetS3Loader() func() ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			defer obj.Body.Close()
+			defer func() {
+				if closeErr := obj.Body.Close(); closeErr != nil && err == nil {
+					err = closeErr
+				}
+			}()
 
 			content, err = io.ReadAll(obj.Body)
 			if err != nil {
