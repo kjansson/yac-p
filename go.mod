@@ -12,7 +12,7 @@ require (
 	github.com/golang/snappy v1.0.0
 	github.com/kjansson/defcon v1.2.1
 	github.com/prometheus-community/yet-another-cloudwatch-exporter v0.63.0
-	github.com/prometheus/client_golang v1.23.1
+	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/prometheus v0.306.0
 	google.golang.org/protobuf v1.36.9
