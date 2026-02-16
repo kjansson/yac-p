@@ -14,9 +14,9 @@ require (
 	github.com/golang/snappy v1.0.0
 	github.com/kjansson/defcon v1.2.1
 	github.com/prometheus-community/yet-another-cloudwatch-exporter v0.62.1
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/client_golang v1.23.0-rc.1
 	github.com/prometheus/client_model v0.6.2
-	github.com/prometheus/prometheus v0.304.1
+	github.com/prometheus/prometheus v0.306.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -52,10 +52,10 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/grafana/regexp v0.0.0-20240607082908-2cb410fa05da // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/prometheus/common v0.63.0 // indirect
+	github.com/prometheus/common v0.65.1-0.20250703115700-7f8b2a0d32d3 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
 )
