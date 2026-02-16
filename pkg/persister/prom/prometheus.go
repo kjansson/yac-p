@@ -3,17 +3,20 @@ package prom
 
 import (
 	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
-	"github.com/aws/aws-sdk-go/aws/session"
-	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/golang/snappy"
 	"github.com/kjansson/yac-p/v3/pkg/types"
 	"github.com/prometheus/prometheus/prompb"
@@ -92,29 +95,47 @@ func (p *PromClient) PersistMetrics(timeSeries []prompb.TimeSeries, logger types
 
 	switch p.AuthType {
 	case "AWS":
-		sess, err := session.NewSession(&aws.Config{
-			Region: aws.String(p.Region),
-		})
+		ctx := context.TODO()
+
+		// Load AWS SDK v2 config
+		cfg, err := config.LoadDefaultConfig(ctx,
+			config.WithRegion(p.Region),
+		)
 		if err != nil {
 			return err
 		}
 
-		var awsCredentials *credentials.Credentials
+		// If a role ARN is provided, assume that role
 		if p.AWSRoleARN != "" {
 			logger.Log("debug", "Using AWS role", slog.String("role_arn", p.AWSRoleARN))
-			awsCredentials = stscreds.NewCredentials(sess, p.AWSRoleARN, func(p *stscreds.AssumeRoleProvider) {
-				host, err := os.Hostname()
-				if err != nil {
-					host = "unknown"
-				}
-				p.RoleSessionName = "aws-sigv4-proxy-" + host
-				logger.Log("debug", "Using AWS role session name", slog.String("role_session_name", p.RoleSessionName))
-			})
-		} else {
-			awsCredentials = sess.Config.Credentials
+
+			host, err := os.Hostname()
+			if err != nil {
+				host = "unknown"
+			}
+			sessionName := "aws-sigv4-proxy-" + host
+			logger.Log("debug", "Using AWS role session name", slog.String("role_session_name", sessionName))
+
+			stsClient := sts.NewFromConfig(cfg)
+			cfg.Credentials = aws.NewCredentialsCache(
+				stscreds.NewAssumeRoleProvider(stsClient, p.AWSRoleARN, func(aro *stscreds.AssumeRoleOptions) {
+					aro.RoleSessionName = sessionName
+				}),
+			)
 		}
 
-		_, err = v4.NewSigner(awsCredentials).Sign(req, body, "aps", p.PrometheusRegion, time.Now())
+		// Sign the request with SigV4
+		credentials, err := cfg.Credentials.Retrieve(ctx)
+		if err != nil {
+			return err
+		}
+
+		// Compute SHA256 hash of the body for signing
+		hash := sha256.Sum256(encoded)
+		payloadHash := hex.EncodeToString(hash[:])
+
+		signer := v4.NewSigner()
+		err = signer.SignHTTP(ctx, credentials, req, payloadHash, "aps", p.PrometheusRegion, time.Now())
 		if err != nil {
 			return err
 		}
