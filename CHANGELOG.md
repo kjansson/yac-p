@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/kjansson/yac-p/compare/v3.1.1...v3.2.0) (2026-02-16)
+
+
+### Features
+
+* bump to aws-sdk-go-v2 ([#68](https://github.com/kjansson/yac-p/issues/68)) ([27cd668](https://github.com/kjansson/yac-p/commit/27cd668d02a7530c20864a33ae50d316a0fd4473))
+
 ## [3.1.1](https://github.com/kjansson/yac-p/compare/v3.1.0...v3.1.1) (2025-06-18)
 
 
