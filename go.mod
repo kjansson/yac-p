@@ -3,7 +3,7 @@ module github.com/kjansson/yac-p/v3
 go 1.24.0
 
 require (
-	github.com/aws/aws-lambda-go v1.49.0
+	github.com/aws/aws-lambda-go v1.52.0
 	github.com/aws/aws-sdk-go-v2 v1.39.0
 	github.com/aws/aws-sdk-go-v2/config v1.31.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.13
